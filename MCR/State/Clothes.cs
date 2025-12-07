@@ -12,7 +12,7 @@ namespace Arro.MCR
         public static void Hook()
         {
             GetCurrentLayout();
-            SetClothesItemgrid();
+            SetClothesItemGrid();
             SetClothingBackgroundSize();
             SetButtonVisibility();
             MoveDoneButton();
@@ -37,7 +37,7 @@ namespace Arro.MCR
             }
         }
 
-        public static void SetClothesItemgrid()
+        public static void SetClothesItemGrid()
         {
             if (CASClothingCategory.gSingleton == null) return;
             var gridArea = CASClothingCategory.gSingleton.mClothingTypesGrid.Area;

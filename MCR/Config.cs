@@ -25,8 +25,6 @@ namespace Arro.MCR
                     {
                         Data.Clothes.Rows = Math.Max(MinRows, xmlDbRow.GetInt("Rows"));
                         Data.Clothes.Columns = Math.Max(MinColumns, xmlDbRow.GetInt("Columns"));
-                        Console.WriteLine(Data.Clothes.Rows.ToString());
-                        Console.WriteLine(Data.Clothes.Columns.ToString());
                     }
                 }
             }

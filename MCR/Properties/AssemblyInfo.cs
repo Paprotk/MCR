@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.InteropServices;
 using Sims3.SimIFace;
 
@@ -14,4 +13,4 @@ using Sims3.SimIFace;
 [assembly: Tunable]
 [assembly: PersistableStatic]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("1.0.0")]
+[assembly: AssemblyVersion("2.0")]
