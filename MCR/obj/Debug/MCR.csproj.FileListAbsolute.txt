@@ -1,0 +1,6 @@
+C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\Arro.MCR.dll
+C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\Arro.MCR.pdb
+C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\MCR.csproj.AssemblyReference.cache
+C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\MCR.csproj.CoreCompileInputs.cache
+C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\Arro.MCR.dll
+C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\Arro.MCR.pdb
