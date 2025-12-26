@@ -57,11 +57,22 @@ namespace Arro.MCR
                 CASClothingCategory.gSingleton.mTrashButton,
                 CASClothingCategory.gSingleton.mSaveButton,
                 CASClothingCategory.gSingleton.mShareButton,
-                CASClothingCategory.gSingleton.mDesignButton,
             };
             foreach (var button in buttons)
             {
                 button.Visible = false;
+            }
+
+            if (Config.Data.Clothes.Columns > 1)
+            {
+                CASClothingCategory.gSingleton.mDesignButton.Position = new Vector2(CASClothingCategory.gSingleton.mTrashButton.Position.x + 310f * TinyUIFixForTS3Integration.getUIScale(),
+                    CASClothingCategory.gSingleton.mSortButton.Position.y - 10.5f * TinyUIFixForTS3Integration.getUIScale());
+                CASClothingCategory.gSingleton.mSortButton.Position = new Vector2(CASClothingCategory.gSingleton.mSortButton.Position.x,
+                    CASClothingCategory.gSingleton.mSortButton.Position.y - 10f * TinyUIFixForTS3Integration.getUIScale());
+            }
+            else
+            {
+                CASClothingCategory.gSingleton.mDesignButton.Visible = false;
             }
         }
 
