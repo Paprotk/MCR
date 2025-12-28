@@ -16,6 +16,7 @@ namespace Arro.MCR
             SetClothingBackgroundSize();
             SetButtonVisibility();
             MoveDoneButton();
+            SetContentTypeFilter();
         }
 
         public static void GetCurrentLayout()
@@ -65,10 +66,21 @@ namespace Arro.MCR
 
             if (Config.Data.Clothes.Columns > 1)
             {
-                CASClothingCategory.gSingleton.mDesignButton.Position = new Vector2(CASClothingCategory.gSingleton.mTrashButton.Position.x + 310f * TinyUIFixForTS3Integration.getUIScale(),
-                    CASClothingCategory.gSingleton.mSortButton.Position.y - 10.5f * TinyUIFixForTS3Integration.getUIScale());
-                CASClothingCategory.gSingleton.mSortButton.Position = new Vector2(CASClothingCategory.gSingleton.mSortButton.Position.x,
-                    CASClothingCategory.gSingleton.mSortButton.Position.y - 10f * TinyUIFixForTS3Integration.getUIScale());
+                CASClothingCategory.gSingleton.mDesignButton.Position = new Vector2(
+                    CASClothingCategory.gSingleton.mTrashButton.Position.x +
+                    310f * TinyUIFixForTS3Integration.getUIScale(),
+                    CASClothingCategory.gSingleton.mSortButton.Position.y -
+                    10.5f * TinyUIFixForTS3Integration.getUIScale());
+                
+                CASClothingCategory.gSingleton.mSortButton.Position = new Vector2(
+                    CASClothingCategory.gSingleton.mSortButton.Position.x,
+                    CASClothingCategory.gSingleton.mSortButton.Position.y -
+                    10f * TinyUIFixForTS3Integration.getUIScale());
+                
+                CASClothingCategory.gSingleton.mContentTypeFilter.Position = new Vector2(
+                    CASClothingCategory.gSingleton.mContentTypeFilter.Position.x,
+                    CASClothingCategory.gSingleton.mContentTypeFilter.Position.y -
+                    10f * TinyUIFixForTS3Integration.getUIScale());
             }
             else
             {
@@ -145,6 +157,42 @@ namespace Arro.MCR
                     CAPAccessories.gSingleton.Area = rect;
                     break;
             }
+        }
+
+        private static void SetContentTypeFilter()
+        {
+            var mainWindow = UIManager.GetMainWindow();
+            var holder = mainWindow.GetChildByID(153931569, true) as Window;
+            var sortItemGrid = mainWindow.GetChildByID(189775728, true) as ItemGrid;
+            var imageInsideHolder = sortItemGrid.GetChildByIndex(1);
+
+            sortItemGrid.VisibleRows = (uint)sortItemGrid.Count;
+            var vector2 = sortItemGrid.Position;
+            vector2.y = 40;
+            sortItemGrid.Position = vector2;
+
+            var backgroundHeightHolder = 910;
+            var holderHeight = (backgroundHeightHolder - (24 - sortItemGrid.Count) * 32) * TinyUIFixForTS3Integration.getUIScale();
+
+            var holderArea = holder.Area;
+            holderArea.Height = holderHeight;
+            holder.Area = holderArea;
+
+            var sortItemGridArea = sortItemGrid.Area;
+            sortItemGridArea.Height = 500;
+            sortItemGrid.Area = sortItemGridArea;
+
+            var backgroundHeightHolderInsert = 774;
+            var insertHeight = (backgroundHeightHolderInsert - (24 - sortItemGrid.Count) * 32) * TinyUIFixForTS3Integration.getUIScale();
+            var insertArea = imageInsideHolder.Area;
+            insertArea.Height = insertHeight;
+            imageInsideHolder.Area = insertArea;
+
+            var area = holder.Area;
+            float baseWidth = area.Width;
+            float widthPerColumn = 300f * TinyUIFixForTS3Integration.getUIScale();
+            area.Width = baseWidth + (widthPerColumn * (Config.Data.Clothes.Columns - 1));
+            holder.Area = area;
         }
     }
 }
