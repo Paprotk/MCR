@@ -17,6 +17,7 @@ namespace Arro.MCR
             SetButtonVisibility();
             MoveDoneButton();
             SetContentTypeFilter();
+            CareerButtonFix();
         }
 
         public static void GetCurrentLayout()
@@ -71,12 +72,12 @@ namespace Arro.MCR
                     310f * TinyUIFixForTS3Integration.getUIScale(),
                     CASClothingCategory.gSingleton.mSortButton.Position.y -
                     10.5f * TinyUIFixForTS3Integration.getUIScale());
-                
+
                 CASClothingCategory.gSingleton.mSortButton.Position = new Vector2(
                     CASClothingCategory.gSingleton.mSortButton.Position.x,
                     CASClothingCategory.gSingleton.mSortButton.Position.y -
                     10f * TinyUIFixForTS3Integration.getUIScale());
-                
+
                 CASClothingCategory.gSingleton.mContentTypeFilter.Position = new Vector2(
                     CASClothingCategory.gSingleton.mContentTypeFilter.Position.x,
                     CASClothingCategory.gSingleton.mContentTypeFilter.Position.y -
@@ -168,22 +169,24 @@ namespace Arro.MCR
 
             sortItemGrid.VisibleRows = (uint)sortItemGrid.Count;
             var vector2 = sortItemGrid.Position;
-            vector2.y = 40;
+            vector2.y = 40 * TinyUIFixForTS3Integration.getUIScale();
             sortItemGrid.Position = vector2;
 
-            var backgroundHeightHolder = 910;
-            var holderHeight = (backgroundHeightHolder - (24 - sortItemGrid.Count) * 32) * TinyUIFixForTS3Integration.getUIScale();
+            var backgroundHeightHolder = 910 * TinyUIFixForTS3Integration.getUIScale();
+            var holderHeight = (backgroundHeightHolder - (24 - sortItemGrid.Count) * 32) *
+                               TinyUIFixForTS3Integration.getUIScale();
 
             var holderArea = holder.Area;
             holderArea.Height = holderHeight;
             holder.Area = holderArea;
 
             var sortItemGridArea = sortItemGrid.Area;
-            sortItemGridArea.Height = 500;
+            sortItemGridArea.Height = 500 * TinyUIFixForTS3Integration.getUIScale();
             sortItemGrid.Area = sortItemGridArea;
 
-            var backgroundHeightHolderInsert = 774;
-            var insertHeight = (backgroundHeightHolderInsert - (24 - sortItemGrid.Count) * 32) * TinyUIFixForTS3Integration.getUIScale();
+            var backgroundHeightHolderInsert = 774 * TinyUIFixForTS3Integration.getUIScale();
+            var insertHeight = (backgroundHeightHolderInsert - (24 - sortItemGrid.Count) * 32) *
+                               TinyUIFixForTS3Integration.getUIScale();
             var insertArea = imageInsideHolder.Area;
             insertArea.Height = insertHeight;
             imageInsideHolder.Area = insertArea;
@@ -193,6 +196,31 @@ namespace Arro.MCR
             float widthPerColumn = 300f * TinyUIFixForTS3Integration.getUIScale();
             area.Width = baseWidth + (widthPerColumn * (Config.Data.Clothes.Columns - 1));
             holder.Area = area;
+
+            CASPuck.gSingleton.mContentTypeFilter.VisibilityChange -= OnVisibilityChange;
+            CASPuck.gSingleton.mContentTypeFilter.VisibilityChange += OnVisibilityChange;
+        }
+
+        private static void OnVisibilityChange(WindowBase sender, UIVisibilityChangeEventArgs eventArgs)
+        {
+            CASClothingCategory.gSingleton.mDesignButton.Visible =
+                !CASClothingCategory.gSingleton.mDesignButton.Visible;
+        }
+
+        private static void CareerButtonFix()
+        {
+            var mainWindow = UIManager.GetMainWindow();
+            Button originalButton = mainWindow.GetChildByID(0x05dbc509, true) as Button;
+            originalButton.Visible = true;
+
+            var img = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("hud_icon_career_r2", 0U));
+
+            MultiDrawable multiDrawable = originalButton.Drawable as MultiDrawable;
+            DrawableBase component1 = multiDrawable[1U];
+            IconDrawable iconDrawable = component1 as IconDrawable;
+            iconDrawable.Image = img;
+            iconDrawable.Scale = 0.8f * TinyUIFixForTS3Integration.getUIScale();
+            originalButton.Invalidate();
         }
     }
 }
