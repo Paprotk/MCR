@@ -1,4 +1,6 @@
-﻿using Sims3.SimIFace;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using Sims3.SimIFace;
 using Sims3.UI;
 using Sims3.UI.CAS;
 using Sims3.UI.CAS.CAP;
@@ -14,7 +16,7 @@ namespace Arro.MCR
             GetCurrentLayout();
             SetClothesItemGrid();
             SetClothingBackgroundSize();
-            SetButtonVisibility();
+            SetButtonVisibilityAndEffect();
             MoveDoneButton();
             SetContentTypeFilter();
             CareerButtonFix();
@@ -52,7 +54,7 @@ namespace Arro.MCR
             CASClothingCategory.gSingleton.mClothingTypesGrid.Area = gridArea;
         }
 
-        public static void SetButtonVisibility()
+        public static void SetButtonVisibilityAndEffect()
         {
             var buttons = new[]
             {
@@ -86,6 +88,23 @@ namespace Arro.MCR
             else
             {
                 CASClothingCategory.gSingleton.mDesignButton.Visible = false;
+            }
+            var topButtons = new[]
+            {
+                CASClothingCategory.gSingleton.mTopsButton,
+                CASClothingCategory.gSingleton.mBottomsButton,
+                CASClothingCategory.gSingleton.mOutfitsButton,
+                CASClothingCategory.gSingleton.mShoesButton,
+                CASClothingCategory.gSingleton.mAccessoriesButton,
+                CASClothingCategory.gSingleton.mSortButton,
+                CASClothingCategory.gSingleton.mDesignButton
+            };
+            foreach (var button in topButtons)
+            {
+                if (button != null)
+                {
+                    EffectManager.AddScaleEffect(button);
+                }
             }
         }
 
@@ -126,6 +145,7 @@ namespace Arro.MCR
                                                  (Config.Data.Clothes.Columns - 1)), startingPositionY);
                     break;
             }
+            EffectManager.AddScaleEffect(mDoneButton, scale: 1.05f);
         }
 
         public static void SetClothingBackgroundSize()
@@ -196,31 +216,63 @@ namespace Arro.MCR
             float widthPerColumn = 300f * TinyUIFixForTS3Integration.getUIScale();
             area.Width = baseWidth + (widthPerColumn * (Config.Data.Clothes.Columns - 1));
             holder.Area = area;
-
-            CASPuck.gSingleton.mContentTypeFilter.VisibilityChange -= OnVisibilityChange;
-            CASPuck.gSingleton.mContentTypeFilter.VisibilityChange += OnVisibilityChange;
+            
+            List<Button> cellButtons = new List<Button>();
+            
+            foreach (ItemGridCellItem cellItem in sortItemGrid.Items)
+            {
+                CatalogProductFilter.Cell cell = cellItem.mWin as CatalogProductFilter.Cell;
+                if (cell != null)
+                {
+                    Button checkBox = cell.GetChildByID(1U, true) as Button;
+                    if (checkBox != null)
+                    {
+                        cellButtons.Add(checkBox);
+                    }
+                }
+            }
+            foreach (var button in cellButtons)
+            {
+                EffectManager.RemoveAllEffects(button);
+                EffectManager.AddScaleEffect(button, scale: 0.9f);
+            }
+            EffectManager.AddFadeEffect(CASClothingCategory.gSingleton.mDesignButton, duration: 0.2f, EffectBase.TriggerTypes.Manual);
+            if (Config.Data.Clothes.Columns > 1)
+            {
+                CASPuck.gSingleton.mContentTypeFilter.VisibilityChange -= OnContentTypeFilterVisibilityChange;
+                CASPuck.gSingleton.mContentTypeFilter.VisibilityChange += OnContentTypeFilterVisibilityChange;
+            }
         }
-
-        private static void OnVisibilityChange(WindowBase sender, UIVisibilityChangeEventArgs eventArgs)
+        
+        private static void OnContentTypeFilterVisibilityChange(WindowBase sender, UIVisibilityChangeEventArgs eventArgs)
         {
-            CASClothingCategory.gSingleton.mDesignButton.Visible =
-                !CASClothingCategory.gSingleton.mDesignButton.Visible;
+            if (CASClothingCategory.gSingleton.mDesignButton.Tag is FadeEffect fade)
+            {
+                if (eventArgs.Visible)
+                {
+                    fade.TriggerEffect(false);
+                    Simulator.AddObject(new OneShotFunctionTask(() => { CASClothingCategory.gSingleton.mDesignButton.Visible = false; }, StopWatch.TickStyles.Seconds, 0.2f));
+                }
+                else
+                {
+                    fade.TriggerEffect(true);
+                    CASClothingCategory.gSingleton.mDesignButton.Visible = true;
+                }
+            }
         }
 
         private static void CareerButtonFix()
         {
             var mainWindow = UIManager.GetMainWindow();
-            Button originalButton = mainWindow.GetChildByID(0x05dbc509, true) as Button;
-            originalButton.Visible = true;
+            var careerButton = mainWindow.GetChildByID(0x05dbc509, true) as Button;
+            careerButton.Visible = true;
 
-            var img = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("hud_icon_career_r2", 0U));
-
-            MultiDrawable multiDrawable = originalButton.Drawable as MultiDrawable;
-            DrawableBase component1 = multiDrawable[1U];
-            IconDrawable iconDrawable = component1 as IconDrawable;
-            iconDrawable.Image = img;
+            MultiDrawable multiDrawable = careerButton.Drawable as MultiDrawable;
+            DrawableBase buttonIconDrawable = multiDrawable[1U];
+            IconDrawable iconDrawable = buttonIconDrawable as IconDrawable;
+            iconDrawable.Image = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("hud_icon_career_r2", 0U));
             iconDrawable.Scale = 0.8f * TinyUIFixForTS3Integration.getUIScale();
-            originalButton.Invalidate();
+            careerButton.Invalidate();
         }
     }
 }
