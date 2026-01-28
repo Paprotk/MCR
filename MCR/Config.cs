@@ -11,7 +11,7 @@ namespace Arro.MCR
             if (clothes == null)
             {
                 ClothesModuleInstalled = false;
-                Console.WriteLine(ClothesModuleInstalled.ToString());
+                Console.WriteLine("[MCR]" + "ClothesModuleInstalled " + ClothesModuleInstalled.ToString());
             }
             else
             {

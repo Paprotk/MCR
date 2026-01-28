@@ -1,6 +1,9 @@
 ﻿using Sims3.SimIFace;
 using Sims3.UI;
 using System;
+using ScriptCore;
+using Simulator = Sims3.SimIFace.Simulator;
+using World = Sims3.SimIFace.World;
 
 namespace Arro.MCR
 {
@@ -10,7 +13,7 @@ namespace Arro.MCR
 #pragma warning disable CS0169 // Field is never used
         private static bool kInstantiator;
 #pragma warning restore CS0169 // Field is never used
-
+        
         static Main()
         {
             World.sOnStartupAppEventHandler += OnStartupApp;
@@ -21,7 +24,6 @@ namespace Arro.MCR
         private static void OnStartupApp(object sender, EventArgs e)
         {
             Config.Parse();
-            Helpers.CheckForMods();
         }
 
         private static void OnWorldLoadFinished(object sender, EventArgs e)
