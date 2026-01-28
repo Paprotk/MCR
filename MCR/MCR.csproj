@@ -55,6 +55,7 @@
     <Compile Include="State\Clothes.cs" />
   </ItemGroup>
   <ItemGroup>
+    <UpToDateCheckInput Include="resources\**\*" />
     <Content Include="Resources\Arro.MCR.Main.xml" />
     <Content Include="Resources\nameMap.xml" />
     <Content Include="Resources\nameMap.xsd" />
@@ -90,9 +91,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir)Tools\ts3buildtool.exe" -modName="Arro_MCR_2.1" -dllPath="$(TargetPath)" -defaultPath="Packages\Arro"</PostBuildEvent>
+    <Version>2.1</Version>
   </PropertyGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Include="resources\**\*" />
-  </ItemGroup>
+  <PropertyGroup>
+    <PostBuildEvent>"$(SolutionDir)Tools\ts3buildtool.exe" -modName="Arro_$(ProjectName)_$(Version)" -dllPath="$(TargetPath)" -defaultPath="Packages\Arro" -skip="New Folder"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
