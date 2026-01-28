@@ -1,7 +1,6 @@
 ﻿using Sims3.SimIFace;
 using Sims3.UI;
 using System;
-using ScriptCore;
 using Simulator = Sims3.SimIFace.Simulator;
 using World = Sims3.SimIFace.World;
 
