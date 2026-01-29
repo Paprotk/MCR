@@ -11,6 +11,7 @@ namespace Arro.MCR
 {
     public static class ClothingPerformance
     {
+        
         private static Dictionary<string, int> LoadedItems = new Dictionary<string, int>();
 
         public static void Tick()
@@ -527,6 +528,66 @@ namespace Arro.MCR
                 }
             }
         }
+        
+        private static ArrayList CreateGridItemsForGroup(CASClothingRow row, List<object> group)
+        {
+            row.mItems.Clear();
+            row.mTempWindow = null;
+            row.mTempWindowValid = false;
+            
+            int orderIndex = 0;
+            row.mHasFilterableContent = false;
+            
+            foreach (object obj in group)
+            {
+                if (obj is CASPart part)
+                {
+                    bool hasFilterableContent = false;
+                    CASPuck.GetContentTypeFilter().ObjectMatchesFilter(part, ref hasFilterableContent);
+                    if (hasFilterableContent)
+                    {
+                        row.mHasFilterableContent = true;
+                    }
+                    
+                    string presetXML = Simulator.LoadXMLString(
+                        new ResourceKey(part.Key.InstanceId, 53690476U, part.Key.GroupId));
+                    
+                    CASPartPreset preset = new CASPartPreset(part, presetXML);
+                    
+                    if (!preset.Valid)
+                    {
+                        uint numPresets = CASUtils.PartDataNumPresets(part.Key);
+                        if (numPresets > 0)
+                        {
+                            preset = new CASPartPreset(part, 0, 
+                                CASUtils.PartDataGetPreset(part.Key, 0));
+                            if (!preset.Valid) continue;
+                        }
+                        else continue;
+                    }
+                    
+                    if (row.AddPresetGridItem(preset, orderIndex, preset.mPresetId))
+                    {
+                        if (wornParts.ContainsKey(part.BodyType))
+                        {
+                            foreach (CASPart wornPart in wornParts[part.BodyType])
+                            {
+                                if (wornPart.Key == part.Key)
+                                {
+                                    row.mSelectedItem = orderIndex;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        orderIndex++;
+                    }
+                }
+            }
+            
+            row.mNumItems = row.mItems.Count;
+            return row.mItems;
+        }
 
         private static bool AddGridItem(ItemGrid grid, object current, ResourceKey layoutKey, object context)
         {
@@ -803,12 +864,49 @@ namespace Arro.MCR
 
             partList.Clear();
             CacheWornParts();
-
-            foreach (object obj in gSingleton.mPartsList)
+            
+            //Compact mode
+            var compactMode = false;
+            if (gSingleton.mCurrentPart == BodyTypes.Accessories)
             {
-                if (obj != null && CASPuck.GetContentTypeFilter().ObjectMatchesFilter(obj))
+                compactMode = Config.Data.Clothes.CompactModeAccessories;
+            }
+            else
+            {
+                compactMode = Config.Data.Clothes.CompactModeClothes;
+            }
+
+            if (compactMode)
+            {
+                List<object> currentGroup = new List<object>();
+                
+                foreach (object obj in gSingleton.mPartsList)
                 {
-                    partList.Add(obj);
+                    if (obj != null && CASPuck.GetContentTypeFilter().ObjectMatchesFilter(obj))
+                    {
+                        currentGroup.Add(obj);
+                        
+                        if (currentGroup.Count == 3)
+                        {
+                            partList.Add(currentGroup);
+                            currentGroup = new List<object>();
+                        }
+                    }
+                }
+                
+                if (currentGroup.Count > 0)
+                {
+                    partList.Add(currentGroup);
+                }
+            }
+            else
+            {
+                foreach (object obj in gSingleton.mPartsList)
+                {
+                    if (obj != null && CASPuck.GetContentTypeFilter().ObjectMatchesFilter(obj))
+                    {
+                        partList.Add(obj);
+                    }
                 }
             }
 
@@ -943,7 +1041,78 @@ namespace Arro.MCR
 
             if (current != null)
             {
-                if (current is CASPart)
+                if (current is List<object> group)
+                {
+                    CASClothingRow casclothingRow = 
+                        UIManager.LoadLayout(layoutKey).GetWindowByExportID(1) as CASClothingRow;
+                    if (casclothingRow == null) return false;
+                    
+                    casclothingRow.RowController = gSingleton;
+                    
+                    if (group.Count > 0 && group[0] is CASPart)
+                    {
+                        casclothingRow.CASPart = (CASPart)group[0];
+                        casclothingRow.UseEp5AsBaseContent = gSingleton.mIsEp5Base;
+                    }
+                    
+                    ArrayList arrayList = CreateGridItemsForGroup(casclothingRow, group);
+                    
+                    gSingleton.mSortButton.Tag = ((bool)gSingleton.mSortButton.Tag | casclothingRow.HasFilterableContent);
+                    
+                    if (arrayList.Count > 0)
+                    {
+                        if (targetRow >= grid.EntriesCountJ)
+                        {
+                            grid.EntriesCountJ = targetRow + 1;
+                            grid.mGrid.SetRowHeight(targetRow, grid.mGrid.DefaultRowHeight);
+                        }
+
+                        grid.InternalGrid.SetCellWindow(targetCol, targetRow, casclothingRow,
+                            grid.mbStretchCellWindows);
+                        grid.InternalGrid.CellTags[targetCol, targetRow] = casclothingRow;
+                        result = true;
+
+                        grid.mLastEntryI = targetCol;
+                        grid.mLastEntryJ = targetRow;
+                        
+                        if (casclothingRow.SelectedItem != -1)
+                        {
+                            BodyTypes bodyType = casclothingRow.CASPart.BodyType;
+                            
+                            if (gSingleton.IsAccessoryType(bodyType))
+                            {
+                                if (gSingleton.GetWornPart((BodyTypes)CASClothingCategory.sAccessoriesSelection).Key !=
+                                    ResourceKey.kInvalidResourceKey)
+                                {
+                                    if (bodyType == (BodyTypes)CASClothingCategory.sAccessoriesSelection)
+                                    {
+                                        int gridIndex = (targetRow * (int)grid.VisibleColumns) + targetCol;
+                                        grid.SelectedItem = gridIndex;
+                                        gSingleton.mSelectedType = casclothingRow.SelectedType;
+                                        CASClothingCategory.sAccessoriesSelection = (int)bodyType;
+                                        gSingleton.mCurrentPreset = casclothingRow.Selection as CASPartPreset;
+                                    }
+                                }
+                                else
+                                {
+                                    int gridIndex = (targetRow * (int)grid.VisibleColumns) + targetCol;
+                                    grid.SelectedItem = gridIndex;
+                                    gSingleton.mSelectedType = casclothingRow.SelectedType;
+                                    CASClothingCategory.sAccessoriesSelection = (int)bodyType;
+                                    gSingleton.mCurrentPreset = casclothingRow.Selection as CASPartPreset;
+                                }
+                            }
+                            else
+                            {
+                                int gridIndex = (targetRow * (int)grid.VisibleColumns) + targetCol;
+                                grid.SelectedItem = gridIndex;
+                                gSingleton.mSelectedType = casclothingRow.SelectedType;
+                                gSingleton.mCurrentPreset = casclothingRow.Selection as CASPartPreset;
+                            }
+                        }
+                    }
+                }
+                else if (current is CASPart)
                 {
                     CASPart caspart = (CASPart)current;
                     CASClothingRow casclothingRow =

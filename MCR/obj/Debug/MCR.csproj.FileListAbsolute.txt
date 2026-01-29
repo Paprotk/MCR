@@ -13,4 +13,4 @@ C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\System.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\System.Xml.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\MCR.csproj.Up2Date
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\ScriptCore.dll
-C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\UILAla111l.dll
+C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\UI_MCR.dll

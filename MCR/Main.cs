@@ -46,6 +46,9 @@ namespace Arro.MCR
             {
                 Simulator.DestroyObject(CASHook);
             }
+
+            if (!Config.Data.Clothes.SmoothPatch) return;
+            
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (ClothingPerformance.taskGuid != null)
             {
@@ -67,6 +70,7 @@ namespace Arro.MCR
             else
             {
                 Simulator.DestroyObject(CASHook);
+                if (!Config.Data.Clothes.SmoothPatch) return;
                 Simulator.DestroyObject(ClothingPerformance.taskGuid);
             }
         }

@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Sims3.SimIFace;
+﻿using Sims3.SimIFace;
 using Sims3.UI;
 using Sims3.UI.CAS;
 

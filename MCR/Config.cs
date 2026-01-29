@@ -1,4 +1,5 @@
 using System;
+using Sims3.Gameplay.Abstracts;
 using Sims3.Gameplay.Utilities;
 
 namespace Arro.MCR
@@ -11,7 +12,6 @@ namespace Arro.MCR
             if (clothes == null)
             {
                 ClothesModuleInstalled = false;
-                Console.WriteLine("[MCR]" + "ClothesModuleInstalled " + ClothesModuleInstalled.ToString());
             }
             else
             {
@@ -25,6 +25,9 @@ namespace Arro.MCR
                     {
                         Data.Clothes.Rows = Math.Max(MinRows, xmlDbRow.GetInt("Rows"));
                         Data.Clothes.Columns = Math.Max(MinColumns, xmlDbRow.GetInt("Columns"));
+                        Data.Clothes.SmoothPatch = xmlDbRow.GetBool("SmoothPatch");
+                        Data.Clothes.CompactModeClothes = xmlDbRow.GetBool("CompactModeClothes");
+                        Data.Clothes.CompactModeAccessories = xmlDbRow.GetBool("CompactModeAccessories");
                     }
                 }
             }
@@ -57,6 +60,9 @@ namespace Arro.MCR
             {
                 public static int Rows;
                 public static int Columns;
+                public static bool SmoothPatch;
+                public static bool CompactModeClothes;
+                public static bool CompactModeAccessories;
             }
             public static class Hair
             {

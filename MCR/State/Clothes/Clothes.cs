@@ -24,8 +24,9 @@ namespace Arro.MCR
             SetContentTypeFilter();
             if (CASClothing.gSingleton.mCareerButton.Visible)
             {
-                CareerButtonFix();
-            } 
+                CareerButtonFix(); 
+            }
+            if (!Config.Data.Clothes.SmoothPatch) return;
             ClothingPerformance.taskGuid = Simulator.AddObject(new ClothingPerformanceHookTask());
         }
 

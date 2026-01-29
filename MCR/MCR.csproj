@@ -53,8 +53,8 @@
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="State\Clothes\Clothes.cs" />
-    <Compile Include="State\Clothes\LazyLoadingClothes.cs" />
-    <Compile Include="State\Clothes\LazyLoadingClothesHookTask.cs" />
+    <Compile Include="State\Clothes\LazyLoading.cs" />
+    <Compile Include="State\Clothes\LazyLoadingHookTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Include="resources\**\*" />
@@ -88,8 +88,12 @@
       <HintPath>..\..\DLLS\System.Xml.dll</HintPath>
     </Reference>
     <Reference Include="UI">
-      <HintPath>..\..\DLLS\UILAla111l.dll</HintPath>
+      <HintPath>..\..\DLLS\UI_MCR.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="State\Face\" />
+    <Folder Include="State\Hair\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
