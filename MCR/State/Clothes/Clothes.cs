@@ -25,7 +25,8 @@ namespace Arro.MCR
             if (CASClothing.gSingleton.mCareerButton.Visible)
             {
                 CareerButtonFix();
-            }
+            } 
+            ClothingPerformance.taskGuid = Simulator.AddObject(new ClothingPerformanceHookTask());
         }
 
         public static void GetCurrentLayout()

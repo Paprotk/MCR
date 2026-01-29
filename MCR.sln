@@ -1,8 +1,8 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 # SharpDevelop 5.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCR", "MCR\MCR.csproj", "{7f54af04-1c72-4873-872a-5be813ded572}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCR", "MCR\MCR.csproj", "{7F54AF04-1C72-4873-872A-5BE813DED572}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

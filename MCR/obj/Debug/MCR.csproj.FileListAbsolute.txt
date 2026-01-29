@@ -5,12 +5,12 @@ C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\MCR.csproj.CoreCompileInputs.cache
 C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\Arro.MCR.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\Arro.MCR.pdb
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\mscorlib.dll
-C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\ScriptCore_publicized.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\SimIFace.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\Sims3GameplaySystems.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\Sims3MetaData.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\Sims3StoreObjects.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\System.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\System.Xml.dll
-C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\UI_publicized.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\obj\Debug\MCR.csproj.Up2Date
+C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\ScriptCore.dll
+C:\Users\Arek\RiderProjects\MCR\MCR\bin\Debug\UILAla111l.dll

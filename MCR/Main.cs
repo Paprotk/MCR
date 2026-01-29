@@ -46,6 +46,11 @@ namespace Arro.MCR
             {
                 Simulator.DestroyObject(CASHook);
             }
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (ClothingPerformance.taskGuid != null)
+            {
+                Simulator.DestroyObject(ClothingPerformance.taskGuid);
+            }
         }
 
         internal static void OnGameStateChanged(Responder.GameSubState previousState, Responder.GameSubState newState)
@@ -62,6 +67,7 @@ namespace Arro.MCR
             else
             {
                 Simulator.DestroyObject(CASHook);
+                Simulator.DestroyObject(ClothingPerformance.taskGuid);
             }
         }
 
