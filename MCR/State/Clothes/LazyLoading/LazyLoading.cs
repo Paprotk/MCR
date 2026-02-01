@@ -110,7 +110,7 @@ public static class LazyLoading
             gSingleton2.mHorseSaddleButton.Click += LazyLoading.HookedOnCategoryButtonClick;
             gSingleton2.FadeTransitionFinished += LazyLoading.HookedOnFadeFinished;
             LazyLoading.layoutKey = ResourceKey.CreateUILayoutKey("CASClothingRow", 0U);
-            LazyLoading.placeHolderRow = (UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID(1) as CASClothingRow);
+            LazyLoading.placeHolderRow = UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID<CASClothingRow>(1);
             LazyLoading.placeHolderRow.Visible = false;
             Logger.Log("LazyLoadingHookTask created");
         }
@@ -953,7 +953,7 @@ public static class LazyLoading
             if (current is List<object> group)
             {
                 CASClothingRow casclothingRow = 
-                    UIManager.LoadLayout(layoutKey).GetWindowByExportID(1) as CASClothingRow;
+                    UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID<CASClothingRow>(1);
                 if (casclothingRow == null) return false;
                 casclothingRow.RowController = gSingleton;
                     
@@ -1025,7 +1025,7 @@ public static class LazyLoading
             {
                 CASPart caspart = (CASPart)current;
                 CASClothingRow casclothingRow =
-                    UIManager.LoadLayout(layoutKey).GetWindowByExportID(1) as CASClothingRow;
+                    UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID<CASClothingRow>(1);
                 casclothingRow.UseEp5AsBaseContent = gSingleton.mIsEp5Base;
                 casclothingRow.CASPart = caspart;
                 casclothingRow.RowController = gSingleton;

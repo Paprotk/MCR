@@ -67,11 +67,11 @@
     <Compile Include="..\..\Common\Common\Debugging\Logger\Logger.cs">
       <Link>Common\Debugging\Logger\Logger.cs</Link>
     </Compile>
-    <Compile Include="..\..\Common\Common\ExtensionMethods\DisposeObjectGuid.cs">
-      <Link>Common\ExtensionMethods\DisposeObjectGuid.cs</Link>
+    <Compile Include="..\..\Common\Common\ExtensionMethods\ObjectGuidExtensions.cs">
+      <Link>Common\ExtensionMethods\ObjectGuidExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\Common\Common\ExtensionMethods\GetChild.cs">
-      <Link>Common\ExtensionMethods\GetChild.cs</Link>
+    <Compile Include="..\..\Common\Common\ExtensionMethods\WindowExtensions.cs">
+      <Link>Common\ExtensionMethods\WindowExtensions.cs</Link>
     </Compile>
     <Compile Include="..\..\Common\Common\Main.cs">
       <Link>Common\Main.cs</Link>
