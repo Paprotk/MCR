@@ -21,7 +21,7 @@ namespace Arro.MCR
                 {
                     const int MinRows = 3;
                     const int MinColumns = 1;
-                    foreach (XmlDbRow xmlDbRow in xmlDbTable.Rows)
+                    foreach (var xmlDbRow in xmlDbTable.Rows)
                     {
                         Data.Clothes.Rows = Math.Max(MinRows, xmlDbRow.GetInt("Rows"));
                         Data.Clothes.Columns = Math.Max(MinColumns, xmlDbRow.GetInt("Columns"));
@@ -58,11 +58,11 @@ namespace Arro.MCR
         {
             public static class Clothes
             {
-                public static int Rows;
-                public static int Columns;
-                public static bool SmoothPatch;
-                public static bool CompactModeClothes;
-                public static bool CompactModeAccessories;
+                public static int Rows { get; set; }
+                public static int Columns { get; set; }
+                public static bool SmoothPatch { get; set; }
+                public static bool CompactModeClothes { get; set; }
+                public static bool CompactModeAccessories { get; set; }
             }
             public static class Hair
             {

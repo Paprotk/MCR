@@ -22,19 +22,66 @@ namespace Arro.MCR
         
         private static Dictionary<string, int> LoadedItems = new Dictionary<string, int>();
         
-        public static void CreateLazyLoadingTask()
+        public static void InitializeLazyLoading()
         {
-            Logger.Log("CreateLazyLoadingTask() called");
             try
             {
-                Simulator.DestroyObject(LazyLoading.TaskGuid);
+                Simulator.DestroyObject(TaskGuid);
             }
             catch (Exception e)
             {
                 Logger.Log(e);
             }
-            LazyLoading.TaskGuid = Simulator.AddObject(new LazyLoadingHookTask());
-            Logger.Log("Created new task guid");
+            TaskGuid = Simulator.AddObject(new LazyLoadingHookTask());
+            if (Clothes.currentLayout == CASDresserClothing.gSingleton)
+            {
+                HookCASDresser();
+            }
+            else
+            {
+                HookCASClothingOrCAPAccessories();
+            }
+            CASClothingCategory gSingleton2 = CASClothingCategory.gSingleton;
+            {
+                CatalogProductFilter mContentTypeFilter = gSingleton2.mContentTypeFilter;
+                mContentTypeFilter.FiltersChanged = (VoidEventHandler)Delegate.Remove(mContentTypeFilter.FiltersChanged,
+                    new VoidEventHandler(gSingleton2.PopulateTypesGrid));
+                gSingleton2.mTopsButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mBottomsButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mShoesButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mOutfitsButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mAccessoriesButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mHorseBridlesButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mHorseSaddleButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.FadeTransitionFinished -= gSingleton2.OnFadeFinished;
+                CatalogProductFilter mContentTypeFilter2 = gSingleton2.mContentTypeFilter;
+                mContentTypeFilter2.FiltersChanged =
+                    (VoidEventHandler)Delegate.Remove(mContentTypeFilter2.FiltersChanged,
+                        new VoidEventHandler(LazyLoading.HookedPopulateTypesGrid));
+                gSingleton2.mTopsButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mBottomsButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mShoesButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mOutfitsButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mAccessoriesButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mHorseBridlesButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mHorseSaddleButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.FadeTransitionFinished -= LazyLoading.HookedOnFadeFinished;
+                CatalogProductFilter mContentTypeFilter3 = gSingleton2.mContentTypeFilter;
+                mContentTypeFilter3.FiltersChanged =
+                    (VoidEventHandler)Delegate.Combine(mContentTypeFilter3.FiltersChanged,
+                        new VoidEventHandler(LazyLoading.HookedPopulateTypesGrid));
+                gSingleton2.mTopsButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mBottomsButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mShoesButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mOutfitsButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mAccessoriesButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mHorseBridlesButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mHorseSaddleButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.FadeTransitionFinished += LazyLoading.HookedOnFadeFinished;
+                LazyLoading.layoutKey = ResourceKey.CreateUILayoutKey("CASClothingRow", 0U);
+                LazyLoading.placeHolderRow = (UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID(1) as CASClothingRow);
+                LazyLoading.placeHolderRow.Visible = false;
+            }
         }
 
         public static void HookCASClothingOrCAPAccessories()
@@ -53,9 +100,6 @@ namespace Arro.MCR
             Responder.Instance.CASModel.OnSimOutfitIndexChanged += OnSimOutfitIndexChanged;
             Responder.Instance.CASModel.OnSimOutfitCategoryChanged += DresserOnSimOutfitCategoryChanged;
         }
-        // public static void CASControllerHook()
-        // {
-        // }
         
         public static void OnSimOutfitIndexChanged(int index)
         {
@@ -84,15 +128,6 @@ namespace Arro.MCR
             }
         }
 
-        // public static void CASDresserClothingHook()
-        // {
-        //     CASDresserClothing gSingleton = CASDresserClothing.gSingleton;
-        //     Responder.Instance.CASModel.OnSimOutfitIndexChanged -= gSingleton.OnSimOutfitIndexChanged;
-        //     Responder.Instance.CASModel.OnSimOutfitIndexChanged += OnSimOutfitIndexChanged;
-        //     Responder.Instance.CASModel.OnSimOutfitCategoryChanged -= gSingleton.OnSimOutfitCategoryChanged;
-        //     Responder.Instance.CASModel.OnSimOutfitCategoryChanged += DresserOnSimOutfitCategoryChanged;
-        // }
-
         public static void DresserOnSimOutfitCategoryChanged(OutfitCategories outfitCategory)
         {
             CASDresserClothing gSingleton = CASDresserClothing.gSingleton;
@@ -119,19 +154,6 @@ namespace Arro.MCR
             HookedPopulateTypesGrid();
         }
 
-        // public static void CASClothingHook()
-        // {
-        //     Logger.Log("CASClothingCategoryHook3");
-        //     //Responder.Instance.CASModel.OnSimOutfitCategoryChanged -= OnSimOutfitCategoryChanged;
-        //     //Responder.Instance.CASModel.OnSimOutfitCategoryChanged += OnSimOutfitCategoryChanged;
-        // }
-
-        // public static void CASClothingUnhook()
-        // {
-        //     Logger.Log("CASClothingCategoryUnHook");
-        //     //Responder.Instance.CASModel.OnSimOutfitCategoryChanged -= OnSimOutfitCategoryChanged;
-        // }
-
         public static void OnSimOutfitCategoryChanged(OutfitCategories outfitCategory)
         {
             Logger.Log("OnSimOutfitCategoryChanged");
@@ -144,11 +166,6 @@ namespace Arro.MCR
                 Logger.Log(e);
             }
         }
-
-        // public static void CASClothingCategoryHook()
-        // {
-        //     
-        // }
 
         public static void CASClothingCategoryUnHook()
         {

@@ -7,29 +7,12 @@ namespace Arro.MCR
 {
     public class LazyLoadingHookTask : Task
     {
-        private bool hookedCASClothingCategory;
-        
         public override void Simulate()
         {
-            //Only in CAS
-            if (!Responder.Instance.InCasMode) 
+            var gSingleton = CASClothingCategory.gSingleton;
+            if (gSingleton == null || !Responder.Instance.InCasMode) 
             {
-                if (hookedCASClothingCategory)
-                {
-                    Logger.Log("CASClothingCategoryUnHook1");
-                    LazyLoading.CASClothingCategoryUnHook();
-                    hookedCASClothingCategory = false;
-                }
-                return;
-            }
-            
-            //Is clothing category null?
-            CASClothingCategory gSingleton = CASClothingCategory.gSingleton;
-            if (gSingleton == null) 
-            {
-                    Logger.Log("CASClothingCategoryUnHook");
-                    LazyLoading.CASClothingCategoryUnHook();
-                    hookedCASClothingCategory = false;
+                LazyLoading.CASClothingCategoryUnHook(); // -> Clean caches
                 return;
             }
             
