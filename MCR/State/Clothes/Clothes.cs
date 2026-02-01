@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Arro.Common;
 using Sims3.SimIFace;
 using Sims3.UI;
 using Sims3.UI.CAS;
@@ -7,6 +8,7 @@ using Sims3.UI.CAS.CAP;
 using Simulator = Sims3.SimIFace.Simulator;
 using StopWatch = Sims3.SimIFace.StopWatch;
 using UIManager = Sims3.UI.UIManager;
+using static Arro.Common.Logger;
 
 namespace Arro.MCR
 {
@@ -16,6 +18,7 @@ namespace Arro.MCR
 
         public static void Hook()
         {
+            Log("Hook() Called");   
             GetCurrentLayout();
             SetClothesItemGrid();
             SetClothingBackgroundSize();
@@ -26,8 +29,21 @@ namespace Arro.MCR
             {
                 CareerButtonFix(); 
             }
-            if (!Config.Data.Clothes.SmoothPatch) return;
-            ClothingPerformance.taskGuid = Simulator.AddObject(new ClothingPerformanceHookTask());
+        }
+
+        private static void CreateLazyLoadingTask()
+        {
+            Log("CreateLazyLoadingTask() called");
+            try
+            {
+                Simulator.DestroyObject(LazyLoading.TaskGuid);
+            }
+            catch (Exception e)
+            {
+                Log(e);
+            }
+            LazyLoading.TaskGuid = Simulator.AddObject(new LazyLoadingHookTask());
+            Log("Created new task guid");
         }
 
         public static void GetCurrentLayout()
@@ -36,16 +52,28 @@ namespace Arro.MCR
                 CAPAccessories.sCAPAccessoriesLayout == null)
             {
                 currentLayout = CASClothing.gSingleton;
+                if (Config.Data.Clothes.SmoothPatch)
+                {
+                    CreateLazyLoadingTask();
+                }
             }
             else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout != null &&
                      CAPAccessories.sCAPAccessoriesLayout == null)
             {
                 currentLayout = CASDresserClothing.gSingleton;
+                if (Config.Data.Clothes.SmoothPatch)
+                {
+                    CreateLazyLoadingTask();
+                }
             }
             else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout == null &&
                      CAPAccessories.sCAPAccessoriesLayout != null)
             {
                 currentLayout = CAPAccessories.gSingleton;
+                if (Config.Data.Clothes.SmoothPatch)
+                {
+                    CreateLazyLoadingTask();
+                }
             }
         }
 
@@ -53,9 +81,9 @@ namespace Arro.MCR
         {
             var gridArea = CASClothingCategory.gSingleton.mClothingTypesGrid.Area;
             var visibleRows = (uint)Config.Data.Clothes.Rows;
-            gridArea.Height = (139f * Config.Data.Clothes.Rows) * TinyUIFixForTS3Integration.getUIScale();
+            gridArea.Height = (139f * Config.Data.Clothes.Rows) * TinyUIFix.Scale;
             var visibleColumns = (uint)Config.Data.Clothes.Columns;
-            gridArea.Width = (305f * Config.Data.Clothes.Columns + 20f) * TinyUIFixForTS3Integration.getUIScale();
+            gridArea.Width = (305f * Config.Data.Clothes.Columns + 20f) * TinyUIFix.Scale;
             CASClothingCategory.gSingleton.mClothingTypesGrid.VisibleColumns = visibleColumns;
             CASClothingCategory.gSingleton.mClothingTypesGrid.VisibleRows = visibleRows;
             CASClothingCategory.gSingleton.mClothingTypesGrid.Area = gridArea;
@@ -78,14 +106,14 @@ namespace Arro.MCR
             {
                 CASClothingCategory.gSingleton.mDesignButton.Position = new Vector2(
                     CASClothingCategory.gSingleton.mTrashButton.Position.x +
-                    310f * TinyUIFixForTS3Integration.getUIScale(),
+                    310f * TinyUIFix.Scale,
                     CASClothingCategory.gSingleton.mSortButton.Position.y -
-                    10.5f * TinyUIFixForTS3Integration.getUIScale());
+                    10.5f * TinyUIFix.Scale);
 
                 CASClothingCategory.gSingleton.mSortButton.Position = new Vector2(
                     CASClothingCategory.gSingleton.mSortButton.Position.x,
                     CASClothingCategory.gSingleton.mSortButton.Position.y -
-                    10f * TinyUIFixForTS3Integration.getUIScale());
+                    10f * TinyUIFix.Scale);
             }
             else
             {
@@ -172,7 +200,7 @@ namespace Arro.MCR
                     startingPositionY = 6f;
                     mDoneButton.Position =
                         new Vector2(
-                            startingPositionX + (300 * TinyUIFixForTS3Integration.getUIScale() *
+                            startingPositionX + (300 * TinyUIFix.Scale *
                                                  (Config.Data.Clothes.Columns - 1)), startingPositionY);
                     break;
                 case CASDresserClothing _:
@@ -181,7 +209,7 @@ namespace Arro.MCR
                     startingPositionY = 6f;
                     mDoneButton.Position =
                         new Vector2(
-                            startingPositionX + (300 * TinyUIFixForTS3Integration.getUIScale() *
+                            startingPositionX + (300 * TinyUIFix.Scale *
                                                  (Config.Data.Clothes.Columns - 1)), startingPositionY);
                     break;
                 case CAPAccessories _:
@@ -190,7 +218,7 @@ namespace Arro.MCR
                     startingPositionY = 35f;
                     mDoneButton.Position =
                         new Vector2(
-                            startingPositionX + (300 * TinyUIFixForTS3Integration.getUIScale() *
+                            startingPositionX + (300 * TinyUIFix.Scale *
                                                  (Config.Data.Clothes.Columns - 1)), startingPositionY);
                     break;
             }
@@ -201,8 +229,8 @@ namespace Arro.MCR
         public static void SetClothingBackgroundSize()
         {
             var backgroundHeight = (534f + (139f * (Config.Data.Clothes.Rows - 3))) *
-                                   TinyUIFixForTS3Integration.getUIScale();
-            var backgroundWidth = (300f * Config.Data.Clothes.Columns + 109f) * TinyUIFixForTS3Integration.getUIScale();
+                                   TinyUIFix.Scale;
+            var backgroundWidth = (300f * Config.Data.Clothes.Columns + 109f) * TinyUIFix.Scale;
             if (currentLayout == null) return;
             Rect rect;
             switch (currentLayout)
@@ -268,11 +296,11 @@ namespace Arro.MCR
             if (Config.Data.Clothes.Rows >= 6 || CASPuck.gSingleton.mContentTypeFilter.mCells.Count <
                 GetFilterRowsFromClothingRows(Config.Data.Clothes.Rows))
             {
-                vector2sortItemGridPosition.y = 48 * TinyUIFixForTS3Integration.getUIScale();
+                vector2sortItemGridPosition.y = 48 * TinyUIFix.Scale;
             }
             else
             {
-                vector2sortItemGridPosition.y = 67 * TinyUIFixForTS3Integration.getUIScale();
+                vector2sortItemGridPosition.y = 67 * TinyUIFix.Scale;
             }
 
             sortItemGrid.Position = vector2sortItemGridPosition;
@@ -308,11 +336,11 @@ namespace Arro.MCR
 
             var baseItemGridHeight = -126f;
             var baseMGridHeight = 0f;
-            var baseButtonY = 191f * TinyUIFixForTS3Integration.getUIScale();
+            var baseButtonY = 191f * TinyUIFix.Scale;
 
-            var itemGridHeight = baseItemGridHeight + (64f * (sortItemGrid.VisibleRows - 5)) * TinyUIFixForTS3Integration.getUIScale();
-            var mGridHeight = baseMGridHeight + (32f * (sortItemGrid.VisibleRows - 5)) * TinyUIFixForTS3Integration.getUIScale();
-            var buttonY = baseButtonY + (64f * (sortItemGrid.VisibleRows - 5)) * TinyUIFixForTS3Integration.getUIScale();
+            var itemGridHeight = baseItemGridHeight + (64f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
+            var mGridHeight = baseMGridHeight + (32f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
+            var buttonY = baseButtonY + (64f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
 
             var itemGridArea = sortItemGrid.Area;
             itemGridArea.Height = itemGridHeight;
@@ -328,9 +356,9 @@ namespace Arro.MCR
 
             var holderArea = holderWin.Area;
             var originalWidth = holderArea.Width;
-            var columnWidth = 300f * TinyUIFixForTS3Integration.getUIScale();
+            var columnWidth = 300f * TinyUIFix.Scale;
             var extraWidth = columnWidth * (Config.Data.Clothes.Columns - 1);
-            holderArea.Width = originalWidth + extraWidth - 30f * TinyUIFixForTS3Integration.getUIScale();
+            holderArea.Width = originalWidth + extraWidth - 30f * TinyUIFix.Scale;
             holderWin.Area = holderArea;
 
             sortItemGrid.UpdateGridSize();
@@ -477,7 +505,7 @@ namespace Arro.MCR
             var buttonIconDrawable = multiDrawable[1U];
             var iconDrawable = buttonIconDrawable as IconDrawable;
             iconDrawable.Image = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("hud_icon_career_r2", 0U));
-            iconDrawable.Scale = 0.8f * TinyUIFixForTS3Integration.getUIScale();
+            iconDrawable.Scale = 0.8f * TinyUIFix.Scale;
             careerButton.Invalidate();
         }
     }

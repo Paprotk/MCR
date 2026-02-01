@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Arro.Common;
 using Sims3.SimIFace;
 using Sims3.SimIFace.CAS;
 using Sims3.UI;
@@ -9,7 +10,14 @@ using Sims3.UI.Store;
 
 namespace Arro.MCR
 {
-    public static class ClothingPerformance
+    /*
+     * A massive thank you to Lazy Duchess (https://www.tumblr.com/lazyduchess) for their incredible foundational
+     * work. This project, including the LazyLoadingHookTask, is built directly upon their
+     * original code. My contribution was primarily focused on implementing and ensuring
+     * compatibility for Compact Mode, which is heavily based on NRaas Master Controller Code.
+     */
+    
+    public static class LazyLoading
     {
         
         private static Dictionary<string, int> LoadedItems = new Dictionary<string, int>();
@@ -19,6 +27,7 @@ namespace Arro.MCR
             CASDresserClothing gSingleton = CASDresserClothing.gSingleton;
             if (gSingleton != null)
             {
+                Logger.Log("DRESSER");
                 Responder.Instance.CASModel.OnSimOutfitIndexChanged -= gSingleton.OnSimOutfitIndexChanged;
                 Responder.Instance.CASModel.OnSimOutfitCategoryChanged -= gSingleton.OnSimOutfitCategoryChanged;
                 Responder.Instance.CASModel.OnSimOutfitIndexChanged -= OnSimOutfitIndexChanged;
@@ -29,6 +38,7 @@ namespace Arro.MCR
 
             if (CASClothing.gSingleton != null)
             {
+                Logger.Log("CAS");
                 Responder.Instance.CASModel.OnSimOutfitCategoryChanged -= OnSimOutfitCategoryChanged;
                 Responder.Instance.CASModel.OnSimOutfitCategoryChanged += OnSimOutfitCategoryChanged;
             }
@@ -77,6 +87,7 @@ namespace Arro.MCR
         public static void CASControllerHook()
         {
         }
+        
 
         public static void OnSimOutfitIndexChanged(int index)
         {
@@ -439,7 +450,54 @@ namespace Arro.MCR
             wornParts.Clear();
             wornPresets.Clear();
         }
-
+        
+        private static void SetItem(ItemGrid itemGrid, ItemGridCellItem item, int row)
+        {
+            if (itemGrid.LegalToPlaceItem())
+            {
+                int column;
+                if (itemGrid.mTempEntryI == -1)
+                {
+                    itemGrid.mLastEntryI = (itemGrid.mLastEntryI + 1) % itemGrid.EntriesCountI;
+                    if (itemGrid.mLastEntryI == 0)
+                    {
+                        itemGrid.mLastEntryJ++;
+                        itemGrid.EntriesCountJ = itemGrid.mLastEntryJ + 1;
+                        if (itemGrid.mbHorizontalScrolling)
+                        {
+                            itemGrid.mGrid.SetColumnWidth(itemGrid.mLastEntryJ, itemGrid.mGrid.DefaultColumnWidth);
+                        }
+                        else
+                        {
+                            itemGrid.mGrid.SetRowHeight(itemGrid.mLastEntryJ, itemGrid.mGrid.DefaultRowHeight);
+                        }
+                    }
+                    column = (itemGrid.mbHorizontalScrolling ? itemGrid.mLastEntryJ : itemGrid.mLastEntryI);
+                }
+                else
+                {
+                    itemGrid.mLastEntryJ = itemGrid.mTempEntryJ;
+                    itemGrid.mLastEntryI = itemGrid.mTempEntryI;
+                    column = (itemGrid.mbHorizontalScrolling ? itemGrid.mLastEntryJ : itemGrid.mLastEntryI);
+                    itemGrid.mGrid.ClearCell(column, row);
+                    itemGrid.mTempEntryI = -1;
+                    itemGrid.mTempEntryJ = -1;
+                }
+                item.mWin.Visible = false;
+                itemGrid.mGrid.SetCellWindow(column, row, item.mWin, itemGrid.mbStretchCellWindows);
+                itemGrid.mGrid.CellTags[column, row] = item.mTag;
+                if (!itemGrid.mPopulating)
+                {
+                    itemGrid.mGrid.Refresh();
+                    itemGrid.UpdateScrollbar();
+                    if (itemGrid.ItemRowsChanged != null)
+                    {
+                        itemGrid.ItemRowsChanged();
+                    }
+                }
+            }
+        }
+        
         private static void AddClothingItemAndPresets(CASClothingRow row, object objectOfInterest, bool allowTemp)
         {
             if (objectOfInterest is CASPart)
@@ -615,142 +673,6 @@ namespace Arro.MCR
             }
 
             return result;
-        }
-
-        private static bool SetGridItem(ItemGrid grid, object current, ResourceKey layoutKey, object context, int row)
-        {
-            CASClothingCategory gSingleton = CASClothingCategory.gSingleton;
-            bool result = false;
-            if (current != null)
-            {
-                if (current is CASPart)
-                {
-                    CASPart caspart = (CASPart)current;
-                    CASClothingRow casclothingRow =
-                        UIManager.LoadLayout(layoutKey).GetWindowByExportID(1) as CASClothingRow;
-                    casclothingRow.UseEp5AsBaseContent = gSingleton.mIsEp5Base;
-                    casclothingRow.CASPart = caspart;
-                    casclothingRow.RowController = gSingleton;
-                    ArrayList arrayList = CreateGridItems(casclothingRow, true);
-                    gSingleton.mSortButton.Tag =
-                        ((bool)gSingleton.mSortButton.Tag | casclothingRow.HasFilterableContent);
-                    if (arrayList.Count > 0)
-                    {
-                        SetItem(grid, new ItemGridCellItem(casclothingRow, null), row);
-                        result = true;
-                        if (casclothingRow.SelectedItem != -1)
-                        {
-                            if (gSingleton.IsAccessoryType(caspart.BodyType))
-                            {
-                                if (gSingleton.GetWornPart((BodyTypes)CASClothingCategory.sAccessoriesSelection).Key !=
-                                    ResourceKey.kInvalidResourceKey)
-                                {
-                                    if (caspart.BodyType == (BodyTypes)CASClothingCategory.sAccessoriesSelection)
-                                    {
-                                        grid.SelectedItem = grid.Count - 1;
-                                        gSingleton.mSelectedType = casclothingRow.SelectedType;
-                                        CASClothingCategory.sAccessoriesSelection = (int)caspart.BodyType;
-                                        gSingleton.mCurrentPreset = (casclothingRow.Selection as CASPartPreset);
-                                    }
-                                }
-                                else
-                                {
-                                    grid.SelectedItem = grid.Count - 1;
-                                    gSingleton.mSelectedType = casclothingRow.SelectedType;
-                                    CASClothingCategory.sAccessoriesSelection = (int)caspart.BodyType;
-                                    gSingleton.mCurrentPreset = (casclothingRow.Selection as CASPartPreset);
-                                }
-                            }
-                            else
-                            {
-                                grid.SelectedItem = grid.Count - 1;
-                                gSingleton.mSelectedType = casclothingRow.SelectedType;
-                                gSingleton.mCurrentPreset = (casclothingRow.Selection as CASPartPreset);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    List<object> list = current as List<object>;
-                    if (list != null)
-                    {
-                        CASClothingRow casclothingRow2 =
-                            UIManager.LoadLayout(layoutKey).GetWindowByExportID(1) as CASClothingRow;
-                        casclothingRow2.ObjectOfInterest = list;
-                        casclothingRow2.RowController = gSingleton;
-                        ArrayList arrayList2 = CreateGridItems(casclothingRow2, true);
-                        gSingleton.mSortButton.Tag =
-                            ((bool)gSingleton.mSortButton.Tag | casclothingRow2.HasFilterableContent);
-                        if (arrayList2.Count > 0)
-                        {
-                            SetItem(grid, new ItemGridCellItem(casclothingRow2, null), row);
-                        }
-
-                        result = true;
-                    }
-                }
-            }
-            else
-            {
-                gSingleton.mContentTypeFilter.UpdateFilterButtonState();
-                gSingleton.UpdateButtons(gSingleton.mSelectedType);
-                if (CASClothingCategory.OnClothingGridFinishedPopulating != null)
-                {
-                    CASClothingCategory.OnClothingGridFinishedPopulating();
-                }
-            }
-
-            return result;
-        }
-
-        private static void SetItem(ItemGrid itemGrid, ItemGridCellItem item, int row)
-        {
-            if (itemGrid.LegalToPlaceItem())
-            {
-                int column;
-                if (itemGrid.mTempEntryI == -1)
-                {
-                    itemGrid.mLastEntryI = (itemGrid.mLastEntryI + 1) % itemGrid.EntriesCountI;
-                    if (itemGrid.mLastEntryI == 0)
-                    {
-                        itemGrid.mLastEntryJ++;
-                        itemGrid.EntriesCountJ = itemGrid.mLastEntryJ + 1;
-                        if (itemGrid.mbHorizontalScrolling)
-                        {
-                            itemGrid.mGrid.SetColumnWidth(itemGrid.mLastEntryJ, itemGrid.mGrid.DefaultColumnWidth);
-                        }
-                        else
-                        {
-                            itemGrid.mGrid.SetRowHeight(itemGrid.mLastEntryJ, itemGrid.mGrid.DefaultRowHeight);
-                        }
-                    }
-
-                    column = (itemGrid.mbHorizontalScrolling ? itemGrid.mLastEntryJ : itemGrid.mLastEntryI);
-                }
-                else
-                {
-                    itemGrid.mLastEntryJ = itemGrid.mTempEntryJ;
-                    itemGrid.mLastEntryI = itemGrid.mTempEntryI;
-                    column = (itemGrid.mbHorizontalScrolling ? itemGrid.mLastEntryJ : itemGrid.mLastEntryI);
-                    itemGrid.mGrid.ClearCell(column, row);
-                    itemGrid.mTempEntryI = -1;
-                    itemGrid.mTempEntryJ = -1;
-                }
-
-                item.mWin.Visible = false;
-                itemGrid.mGrid.SetCellWindow(column, row, item.mWin, itemGrid.mbStretchCellWindows);
-                itemGrid.mGrid.CellTags[column, row] = item.mTag;
-                if (!itemGrid.mPopulating)
-                {
-                    itemGrid.mGrid.Refresh();
-                    itemGrid.UpdateScrollbar();
-                    if (itemGrid.ItemRowsChanged != null)
-                    {
-                        itemGrid.ItemRowsChanged();
-                    }
-                }
-            }
         }
 
         private static void AddItem(ItemGrid itemGrid, ItemGridCellItem item)
@@ -995,7 +917,7 @@ namespace Arro.MCR
             int visibleColumns = (int)mClothingTypesGrid.VisibleColumns;
             int visibleRows = (int)mClothingTypesGrid.VisibleRows;
 
-            double scrollPosition = (double)mClothingTypesGrid.VScrollbar.Value / 135.0; // Row height
+            double scrollPosition = (double)mClothingTypesGrid.VScrollbar.Value / 135.0 * TinyUIFix.Scale; // Row height
             int firstVisibleRow = (int)Math.Floor(scrollPosition);
             int lastVisibleRow = firstVisibleRow + visibleRows;
 
@@ -1041,12 +963,12 @@ namespace Arro.MCR
 
             if (current != null)
             {
+                // COMPACT MODE ON
                 if (current is List<object> group)
                 {
                     CASClothingRow casclothingRow = 
                         UIManager.LoadLayout(layoutKey).GetWindowByExportID(1) as CASClothingRow;
                     if (casclothingRow == null) return false;
-                    
                     casclothingRow.RowController = gSingleton;
                     
                     if (group.Count > 0 && group[0] is CASPart)
@@ -1071,7 +993,7 @@ namespace Arro.MCR
                             grid.mbStretchCellWindows);
                         grid.InternalGrid.CellTags[targetCol, targetRow] = casclothingRow;
                         result = true;
-
+                        
                         grid.mLastEntryI = targetCol;
                         grid.mLastEntryJ = targetRow;
                         
@@ -1112,6 +1034,7 @@ namespace Arro.MCR
                         }
                     }
                 }
+                // COMPACT MODE OFF
                 else if (current is CASPart)
                 {
                     CASPart caspart = (CASPart)current;
@@ -1131,12 +1054,12 @@ namespace Arro.MCR
                             grid.EntriesCountJ = targetRow + 1;
                             grid.mGrid.SetRowHeight(targetRow, grid.mGrid.DefaultRowHeight);
                         }
-
+                        
                         grid.InternalGrid.SetCellWindow(targetCol, targetRow, casclothingRow,
                             grid.mbStretchCellWindows);
                         grid.InternalGrid.CellTags[targetCol, targetRow] = casclothingRow;
                         result = true;
-
+                        
                         grid.mLastEntryI = targetCol;
                         grid.mLastEntryJ = targetRow;
 
@@ -1175,43 +1098,9 @@ namespace Arro.MCR
                         }
                     }
                 }
-                else
-                {
-                    List<object> list = current as List<object>;
-                    if (list != null)
-                    {
-                        CASClothingRow casclothingRow =
-                            UIManager.LoadLayout(layoutKey).GetWindowByExportID(1) as CASClothingRow;
-                        casclothingRow.ObjectOfInterest = list;
-                        casclothingRow.RowController = gSingleton;
-                        ArrayList arrayList = CreateGridItems(casclothingRow, true);
-                        gSingleton.mSortButton.Tag =
-                            ((bool)gSingleton.mSortButton.Tag | casclothingRow.HasFilterableContent);
-
-                        if (arrayList.Count > 0)
-                        {
-                            if (targetRow >= grid.EntriesCountJ)
-                            {
-                                grid.EntriesCountJ = targetRow + 1;
-                                grid.mGrid.SetRowHeight(targetRow, grid.mGrid.DefaultRowHeight);
-                            }
-
-                            grid.InternalGrid.SetCellWindow(targetCol, targetRow, casclothingRow,
-                                grid.mbStretchCellWindows);
-                            grid.InternalGrid.CellTags[targetCol, targetRow] = casclothingRow;
-
-                            grid.mLastEntryI = targetCol;
-                            grid.mLastEntryJ = targetRow;
-
-                            result = true;
-                        }
-                    }
-                }
             }
-
             return result;
         }
-
         private static void UpdateScrollbar(ItemGrid grid, int VisibleRange = -1, int UpperBoundValue = -1)
         {
             if (UIManager.IsRunningDesigner)
@@ -1274,7 +1163,7 @@ namespace Arro.MCR
             }
         }
 
-        public static ObjectGuid taskGuid;
+        public static ObjectGuid TaskGuid;
 
         private static ResourceKey layoutKey;
 

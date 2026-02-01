@@ -1,13 +1,23 @@
 ﻿using Sims3.SimIFace;
 using Sims3.UI;
 using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using Arro.Common;
+using Sims3.UI.CAS;
 using Simulator = Sims3.SimIFace.Simulator;
-using World = Sims3.SimIFace.World;
+using static Arro.Common.Logger;
 
 namespace Arro.MCR
 {
     public class Main
     {
+        [GetAssembly("NRaasMasterController")]
+        public static Assembly NraasMC;
+        
+        [GetAssembly("LazyDuchess.SmoothPatch")]
+        public static Assembly LD_SmoothPatch;
+        
         [Tunable]
 #pragma warning disable CS0169 // Field is never used
         private static bool kInstantiator;
@@ -15,45 +25,56 @@ namespace Arro.MCR
         
         static Main()
         {
-            World.sOnStartupAppEventHandler += OnStartupApp;
-            World.sOnWorldLoadFinishedEventHandler += OnWorldLoadFinished;
-            World.sOnWorldQuitEventHandler += OnWorldQuit;
+            Core.Initialize("MCR");
         }
 
-        private static void OnStartupApp(object sender, EventArgs e)
+        [InvokeOnWorldEvent(Event.OnStartupApp)]
+        public static void OnStartupApp(object sender, EventArgs e)
         {
             Config.Parse();
         }
 
-        private static void OnWorldLoadFinished(object sender, EventArgs e)
+        [InvokeOnWorldEvent(Event.OnWorldLoadFinished)]
+        public static void OnWorldLoadFinished(object sender, EventArgs e)
         {
-            bool responder = Sims3.Gameplay.UI.Responder.Instance != null;
+            var responder = Sims3.Gameplay.UI.Responder.Instance != null;
             if (responder)
             {
-                Sims3.Gameplay.UI.Responder instance = Sims3.Gameplay.UI.Responder.Instance;
-                instance.GameStateChanging = (GameStateChangingDelegate)Delegate.Remove(instance.GameStateChanging,
-                    new GameStateChangingDelegate(OnGameStateChanged));
-                Sims3.Gameplay.UI.Responder instance2 = Sims3.Gameplay.UI.Responder.Instance;
-                instance2.GameStateChanging = (GameStateChangingDelegate)Delegate.Combine(instance2.GameStateChanging,
-                    new GameStateChangingDelegate(OnGameStateChanged));
+                Sims3.Gameplay.UI.Responder.Instance.GameStateChanging += OnGameStateChanged;
+            }
+            if (LD_SmoothPatch != null)
+            {
+                try
+                {
+                    var clothingPerfType = LD_SmoothPatch.GetType("LazyDuchess.SmoothPatch.ClothingPerformance");
+                    if (clothingPerfType != null)
+                    {
+                        var guidField = clothingPerfType.GetField("taskGuid", BindingFlags.Static | BindingFlags.NonPublic);
+                        if (guidField != null)
+                        {
+                            var currentGuid = (ObjectGuid)guidField.GetValue(null);
+                            if (currentGuid == ObjectGuid.InvalidObjectGuid) return;
+                            Simulator.DestroyObject(currentGuid);
+                            guidField.SetValue(null, ObjectGuid.InvalidObjectGuid);
+                            Log("SmoothPatch Clothing Performance task destroyed.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("Failed to disable SmoothPatch via reflection: " + ex.Message);
+                }
             }
         }
-
-        private static void OnWorldQuit(object sender, EventArgs e)
+        
+        [InvokeOnWorldEvent(Event.OnWorldQuit)]
+        public static void OnWorldQuit(object sender, EventArgs e)
         {
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (CASHook != null)
-            {
-                Simulator.DestroyObject(CASHook);
-            }
-
+            Simulator.DestroyObject(CASHook);
+            Log("Task destroyed");
             if (!Config.Data.Clothes.SmoothPatch) return;
-            
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (ClothingPerformance.taskGuid != null)
-            {
-                Simulator.DestroyObject(ClothingPerformance.taskGuid);
-            }
+            Simulator.DestroyObject(LazyLoading.TaskGuid);
+            Log("Tasks destroyed");
         }
 
         internal static void OnGameStateChanged(Responder.GameSubState previousState, Responder.GameSubState newState)
@@ -66,22 +87,17 @@ namespace Arro.MCR
                 newState == Responder.GameSubState.CASSurgeryBodyMode)
             {
                 CASHook = Simulator.AddObject(new CASHook());
+                Log("CASHook created");
             }
             else
             {
                 Simulator.DestroyObject(CASHook);
                 if (!Config.Data.Clothes.SmoothPatch) return;
-                Simulator.DestroyObject(ClothingPerformance.taskGuid);
+                Simulator.DestroyObject(LazyLoading.TaskGuid);
+                Log("Tasks destroyed");
             }
         }
 
         public static ObjectGuid CASHook;
-    }
-
-    public static class TinyUIFixForTS3Integration
-    {
-        public delegate float FloatGetter();
-
-        public static FloatGetter getUIScale = () => 1f;
     }
 }

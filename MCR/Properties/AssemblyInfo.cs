@@ -4,7 +4,7 @@ using Sims3.SimIFace;
 
 [assembly: AssemblyTitle("MCR")]
 [assembly: AssemblyProduct("MCR")]
-[assembly: AssemblyCopyright("Copyright 2025")]
+[assembly: AssemblyCopyright("Copyright 2026")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -13,4 +13,4 @@ using Sims3.SimIFace;
 [assembly: Tunable]
 [assembly: PersistableStatic]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("2.1.*")]
+[assembly: AssemblyVersion("2.2.*")]
