@@ -11,479 +11,486 @@ using StopWatch = Sims3.SimIFace.StopWatch;
 using UIManager = Sims3.UI.UIManager;
 using static Arro.Common.Logger;
 
-namespace Arro.MCR
+namespace Arro.MCR;
+
+public class Clothes
 {
-    public class Clothes
+    public static Window currentLayout;
+
+    public static void Hook()
     {
-        public static Window currentLayout;
-
-        public static void Hook()
+        GetCurrentLayout();
+        if (Config.Data.Clothes.SmoothPatchEnabled)
         {
-            GetCurrentLayout();
-            if (Config.Data.Clothes.SmoothPatch)
-            {
-                LazyLoading.InitializeLazyLoading();
-            }
-            SetClothesItemGrid();
-            SetClothingBackgroundSize();
-            SetButtonVisibilityAndEffect();
-            MoveDoneButton();
-            SetContentTypeFilter();
-            if (CASClothing.gSingleton.mCareerButton.Visible)
-            {
-                CareerButtonFix(); 
-            }
+            LazyLoading.InitializeLazyLoading();
+        }
+        SetClothesItemGrid();
+        SetClothingBackgroundSize();
+        SetButtonVisibilityAndEffect();
+        MoveDoneButton();
+        SetContentTypeFilter();
+        if (CASClothing.gSingleton.mCareerButton.Visible)
+        {
+            CareerButtonFix(); 
+        }
+    }
+
+    public static void GetCurrentLayout()
+    {
+        if (CASClothing.sClothingLayout != null && CASDresserClothing.sClothingLayout == null &&
+            CAPAccessories.sCAPAccessoriesLayout == null)
+        {
+            currentLayout = CASClothing.gSingleton;
+        }
+        else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout != null &&
+                 CAPAccessories.sCAPAccessoriesLayout == null)
+        {
+            currentLayout = CASDresserClothing.gSingleton;
+        }
+        else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout == null &&
+                 CAPAccessories.sCAPAccessoriesLayout != null)
+        {
+            currentLayout = CAPAccessories.gSingleton;
+        }
+    }
+
+    public static void SetClothesItemGrid()
+    {
+        var gridArea = CASClothingCategory.gSingleton.mClothingTypesGrid.Area;
+        var visibleRows = (uint)Config.Data.Clothes.RowCount;
+        gridArea.Height = (139f * Config.Data.Clothes.RowCount) * TinyUIFix.Scale;
+        var visibleColumns = (uint)Config.Data.Clothes.ColumnCount;
+        gridArea.Width = (305f * Config.Data.Clothes.ColumnCount + 20f) * TinyUIFix.Scale;
+        CASClothingCategory.gSingleton.mClothingTypesGrid.VisibleColumns = visibleColumns;
+        CASClothingCategory.gSingleton.mClothingTypesGrid.VisibleRows = visibleRows;
+        CASClothingCategory.gSingleton.mClothingTypesGrid.Area = gridArea;
+    }
+
+    public static void SetButtonVisibilityAndEffect()
+    {
+        var designButtons = new[]
+        {
+            CASClothingCategory.gSingleton.mTrashButton,
+            CASClothingCategory.gSingleton.mSaveButton,
+            CASClothingCategory.gSingleton.mShareButton,
+        };
+        foreach (var button in designButtons)
+        {
+            button.Visible = false;
         }
 
-        public static void GetCurrentLayout()
+        if (Config.Data.Clothes.ColumnCount > 1)
         {
-            if (CASClothing.sClothingLayout != null && CASDresserClothing.sClothingLayout == null &&
-                CAPAccessories.sCAPAccessoriesLayout == null)
-            {
-                currentLayout = CASClothing.gSingleton;
-            }
-            else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout != null &&
-                     CAPAccessories.sCAPAccessoriesLayout == null)
-            {
-                currentLayout = CASDresserClothing.gSingleton;
-            }
-            else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout == null &&
-                     CAPAccessories.sCAPAccessoriesLayout != null)
-            {
-                currentLayout = CAPAccessories.gSingleton;
-            }
+            CASClothingCategory.gSingleton.mDesignButton.Position = new Vector2(
+                CASClothingCategory.gSingleton.mTrashButton.Position.x +
+                310f * TinyUIFix.Scale,
+                CASClothingCategory.gSingleton.mSortButton.Position.y -
+                10.5f * TinyUIFix.Scale);
+
+            CASClothingCategory.gSingleton.mSortButton.Position = new Vector2(
+                CASClothingCategory.gSingleton.mSortButton.Position.x,
+                CASClothingCategory.gSingleton.mSortButton.Position.y -
+                10f * TinyUIFix.Scale);
+        }
+        else
+        {
+            CASClothingCategory.gSingleton.mDesignButton.Visible = false;
         }
 
-        public static void SetClothesItemGrid()
+        if (currentLayout == CAPAccessories.gSingleton) return;
+
+        var topButtons = new[]
         {
-            var gridArea = CASClothingCategory.gSingleton.mClothingTypesGrid.Area;
-            var visibleRows = (uint)Config.Data.Clothes.Rows;
-            gridArea.Height = (139f * Config.Data.Clothes.Rows) * TinyUIFix.Scale;
-            var visibleColumns = (uint)Config.Data.Clothes.Columns;
-            gridArea.Width = (305f * Config.Data.Clothes.Columns + 20f) * TinyUIFix.Scale;
-            CASClothingCategory.gSingleton.mClothingTypesGrid.VisibleColumns = visibleColumns;
-            CASClothingCategory.gSingleton.mClothingTypesGrid.VisibleRows = visibleRows;
-            CASClothingCategory.gSingleton.mClothingTypesGrid.Area = gridArea;
-        }
-
-        public static void SetButtonVisibilityAndEffect()
+            CASClothingCategory.gSingleton.mTopsButton,
+            CASClothingCategory.gSingleton.mBottomsButton,
+            CASClothingCategory.gSingleton.mOutfitsButton,
+            CASClothingCategory.gSingleton.mShoesButton,
+            CASClothingCategory.gSingleton.mAccessoriesButton,
+            CASClothingCategory.gSingleton.mSortButton,
+            CASClothingCategory.gSingleton.mDesignButton
+        };
+        foreach (var button in topButtons)
         {
-            var designButtons = new[]
-            {
-                CASClothingCategory.gSingleton.mTrashButton,
-                CASClothingCategory.gSingleton.mSaveButton,
-                CASClothingCategory.gSingleton.mShareButton,
-            };
-            foreach (var button in designButtons)
-            {
-                button.Visible = false;
-            }
-
-            if (Config.Data.Clothes.Columns > 1)
-            {
-                CASClothingCategory.gSingleton.mDesignButton.Position = new Vector2(
-                    CASClothingCategory.gSingleton.mTrashButton.Position.x +
-                    310f * TinyUIFix.Scale,
-                    CASClothingCategory.gSingleton.mSortButton.Position.y -
-                    10.5f * TinyUIFix.Scale);
-
-                CASClothingCategory.gSingleton.mSortButton.Position = new Vector2(
-                    CASClothingCategory.gSingleton.mSortButton.Position.x,
-                    CASClothingCategory.gSingleton.mSortButton.Position.y -
-                    10f * TinyUIFix.Scale);
-            }
-            else
-            {
-                CASClothingCategory.gSingleton.mDesignButton.Visible = false;
-            }
-
-            if (currentLayout == CAPAccessories.gSingleton) return;
-
-            var topButtons = new[]
-            {
-                CASClothingCategory.gSingleton.mTopsButton,
-                CASClothingCategory.gSingleton.mBottomsButton,
-                CASClothingCategory.gSingleton.mOutfitsButton,
-                CASClothingCategory.gSingleton.mShoesButton,
-                CASClothingCategory.gSingleton.mAccessoriesButton,
-                CASClothingCategory.gSingleton.mSortButton,
-                CASClothingCategory.gSingleton.mDesignButton
-            };
-            foreach (var button in topButtons)
-            {
-                try
-                {
-                    if (button != null)
-                    {
-                        EffectManager.AddScaleEffect(button, duration: 0.1f,
-                            triggerType: EffectBase.TriggerTypes.MouseFocus);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                }
-            }
-
-            if (currentLayout != CASClothing.gSingleton) return;
-
-            var casClothingSideButtons = new[]
-            {
-                CASClothing.gSingleton?.mEverydayButton,
-                CASClothing.gSingleton?.mFormalButton,
-                CASClothing.gSingleton?.mSleepwearButton,
-                CASClothing.gSingleton?.mSwimwearButton,
-                CASClothing.gSingleton?.mExerciseButton,
-                CASClothing.gSingleton?.mOuterwearButton,
-                CASClothing.gSingleton?.mCareerButton,
-                CASClothing.gSingleton?.GetChildByID(98288906U, true) as Button,
-            };
-            foreach (var button in casClothingSideButtons)
+            try
             {
                 if (button != null)
                 {
-                    button.FocusAcquired -= OnSideButtonOnFocusAcquired;
-                    button.FocusAcquired += OnSideButtonOnFocusAcquired;
-                    EffectManager.AddGrowEffect(button, leftChange: 1.5f,
-                        triggerType: EffectBase.TriggerTypes.Manual);
-                    EffectManager.AddGrowEffect(button, leftChange: 4f,
-                        triggerType: EffectBase.TriggerTypes.ButtonSelected);
+                    EffectManager.AddScaleEffect(button, duration: 0.1f,
+                        triggerType: EffectBase.TriggerTypes.MouseFocus);
                 }
             }
-        }
-
-        private static void OnSideButtonOnFocusAcquired(WindowBase sender, UIFocusChangeEventArgs eventArgs)
-        {
-            if (sender.Tag is GrowEffect grow && sender.DrawState != (uint)WindowBase.DrawStateFlags.kDrawStateActive)
+            catch (Exception e)
             {
-                grow.Duration = 0.09f;
-                grow.TriggerEffect(false);
+                Console.WriteLine(e.ToString());
             }
         }
 
-        public static Button mDoneButton;
+        if (currentLayout != CASClothing.gSingleton) return;
 
-        public static void MoveDoneButton()
+        var casClothingSideButtons = new[]
         {
-            if (currentLayout == null) return;
-            float startingPositionX;
-            float startingPositionY;
-
-            switch (currentLayout)
-            {
-                case CASClothing _:
-                    mDoneButton = CASClothing.gSingleton.GetChildByID(98278400U, true) as Button;
-                    startingPositionX = -8f;
-                    startingPositionY = 6f;
-                    mDoneButton.Position =
-                        new Vector2(
-                            startingPositionX + (300 * TinyUIFix.Scale *
-                                                 (Config.Data.Clothes.Columns - 1)), startingPositionY);
-                    break;
-                case CASDresserClothing _:
-                    mDoneButton = CASDresserClothing.gSingleton.GetChildByID(98278400U, true) as Button;
-                    startingPositionX = -8f;
-                    startingPositionY = 6f;
-                    mDoneButton.Position =
-                        new Vector2(
-                            startingPositionX + (300 * TinyUIFix.Scale *
-                                                 (Config.Data.Clothes.Columns - 1)), startingPositionY);
-                    break;
-                case CAPAccessories _:
-                    mDoneButton = CAPAccessories.gSingleton.GetChildByID(2095900161U, true) as Button;
-                    startingPositionX = 353f;
-                    startingPositionY = 35f;
-                    mDoneButton.Position =
-                        new Vector2(
-                            startingPositionX + (300 * TinyUIFix.Scale *
-                                                 (Config.Data.Clothes.Columns - 1)), startingPositionY);
-                    break;
-            }
-
-            EffectManager.AddScaleEffect(mDoneButton, scale: 1.05f, duration: 0.1f);
-        }
-
-        public static void SetClothingBackgroundSize()
+            CASClothing.gSingleton?.mEverydayButton,
+            CASClothing.gSingleton?.mFormalButton,
+            CASClothing.gSingleton?.mSleepwearButton,
+            CASClothing.gSingleton?.mSwimwearButton,
+            CASClothing.gSingleton?.mExerciseButton,
+            CASClothing.gSingleton?.mOuterwearButton,
+            CASClothing.gSingleton?.mCareerButton,
+            CASClothing.gSingleton?.GetChildByID(98288906U, true) as Button,
+        };
+        foreach (var button in casClothingSideButtons)
         {
-            var backgroundHeight = (534f + (139f * (Config.Data.Clothes.Rows - 3))) *
-                                   TinyUIFix.Scale;
-            var backgroundWidth = (300f * Config.Data.Clothes.Columns + 109f) * TinyUIFix.Scale;
-            if (currentLayout == null) return;
-            Rect rect;
-            switch (currentLayout)
+            if (button != null)
             {
-                case CASClothing _:
-                    rect = CASClothing.gSingleton.Area;
-                    rect.Height = backgroundHeight;
-                    rect.Width = backgroundWidth;
-                    CASClothing.gSingleton.Area = rect;
-                    break;
-
-                case CASDresserClothing _:
-                    rect = CASDresserClothing.gSingleton.Area;
-                    rect.Height = backgroundHeight;
-                    rect.Width = backgroundWidth;
-                    CASDresserClothing.gSingleton.Area = rect;
-                    break;
-
-                case CAPAccessories _:
-                    rect = CAPAccessories.gSingleton.Area;
-                    rect.Height = backgroundHeight;
-                    rect.Width = backgroundWidth;
-                    CAPAccessories.gSingleton.Area = rect;
-                    break;
+                button.FocusAcquired -= OnSideButtonOnFocusAcquired;
+                button.FocusAcquired += OnSideButtonOnFocusAcquired;
+                EffectManager.AddGrowEffect(button, leftChange: 1.5f,
+                    triggerType: EffectBase.TriggerTypes.Manual);
+                EffectManager.AddGrowEffect(button, leftChange: 4f,
+                    triggerType: EffectBase.TriggerTypes.ButtonSelected);
             }
         }
+    }
 
-        private static int GetVisibleRowsSetting(int desiredActualRows)
+    private static void OnSideButtonOnFocusAcquired(WindowBase sender, UIFocusChangeEventArgs eventArgs)
+    {
+        if (sender.Tag is GrowEffect grow && sender.DrawState != (uint)WindowBase.DrawStateFlags.kDrawStateActive)
         {
-            if (desiredActualRows <= 6)
-                return desiredActualRows;
-            return (int)Math.Ceiling((desiredActualRows + 5) / 2f);
+            grow.Duration = 0.09f;
+            grow.TriggerEffect(false);
+        }
+    }
+
+    public static Button mDoneButton;
+
+    public static void MoveDoneButton()
+    {
+        if (currentLayout == null) return;
+        float startingPositionX;
+        float startingPositionY;
+
+        switch (currentLayout)
+        {
+            case CASClothing _:
+                mDoneButton = CASClothing.gSingleton.GetChildByID(98278400U, true) as Button;
+                startingPositionX = -8f;
+                startingPositionY = 6f;
+                mDoneButton.Position =
+                    new Vector2(
+                        startingPositionX + (300 * TinyUIFix.Scale *
+                                             (Config.Data.Clothes.ColumnCount - 1)), startingPositionY);
+                break;
+            case CASDresserClothing _:
+                mDoneButton = CASDresserClothing.gSingleton.GetChildByID(98278400U, true) as Button;
+                startingPositionX = -8f;
+                startingPositionY = 6f;
+                mDoneButton.Position =
+                    new Vector2(
+                        startingPositionX + (300 * TinyUIFix.Scale *
+                                             (Config.Data.Clothes.ColumnCount - 1)), startingPositionY);
+                break;
+            case CAPAccessories _:
+                mDoneButton = CAPAccessories.gSingleton.GetChildByID(2095900161U, true) as Button;
+                startingPositionX = 353f;
+                startingPositionY = 35f;
+                mDoneButton.Position =
+                    new Vector2(
+                        startingPositionX + (300 * TinyUIFix.Scale *
+                                             (Config.Data.Clothes.ColumnCount - 1)), startingPositionY);
+                break;
         }
 
-        private static int GetFilterRowsFromClothingRows(int clothingRows)
+        mDoneButton.Click += OnDoneButtonClick;
+        EffectManager.AddScaleEffect(mDoneButton, scale: 1.05f, duration: 0.1f);
+    }
+
+    private static void OnDoneButtonClick(WindowBase sender, UIButtonClickEventArgs eventArgs)
+    {
+        mDoneButton.Click -= OnDoneButtonClick;
+        LazyLoading.TaskGuid.Dispose();
+    }
+
+
+    public static void SetClothingBackgroundSize()
+    {
+        var backgroundHeight = (534f + (139f * (Config.Data.Clothes.RowCount - 3))) *
+                               TinyUIFix.Scale;
+        var backgroundWidth = (300f * Config.Data.Clothes.ColumnCount + 109f) * TinyUIFix.Scale;
+        if (currentLayout == null) return;
+        Rect rect;
+        switch (currentLayout)
         {
-            switch (clothingRows)
+            case CASClothing _:
+                rect = CASClothing.gSingleton.Area;
+                rect.Height = backgroundHeight;
+                rect.Width = backgroundWidth;
+                CASClothing.gSingleton.Area = rect;
+                break;
+
+            case CASDresserClothing _:
+                rect = CASDresserClothing.gSingleton.Area;
+                rect.Height = backgroundHeight;
+                rect.Width = backgroundWidth;
+                CASDresserClothing.gSingleton.Area = rect;
+                break;
+
+            case CAPAccessories _:
+                rect = CAPAccessories.gSingleton.Area;
+                rect.Height = backgroundHeight;
+                rect.Width = backgroundWidth;
+                CAPAccessories.gSingleton.Area = rect;
+                break;
+        }
+    }
+
+    private static int GetVisibleRowsSetting(int desiredActualRows)
+    {
+        if (desiredActualRows <= 6)
+            return desiredActualRows;
+        return (int)Math.Ceiling((desiredActualRows + 5) / 2f);
+    }
+
+    private static int GetFilterRowsFromClothingRows(int clothingRows)
+    {
+        switch (clothingRows)
+        {
+            case 3:
+                return 10;
+            case 4:
+                return 15;
+            case 5:
+                return 19;
+            default:
+                return 24;
+        }
+    }
+
+    private static void SetContentTypeFilter()
+    {
+        var holderWin = UIManager.GetMainWindow().GetChildByID(0x092ccf31, true) as Window;
+        var sortItemGrid = UIManager.GetMainWindow().GetChildByID(0x0b4fbf70, true) as ItemGrid;
+        var itemGridImage = sortItemGrid.GetChildByIndex(1);
+        var mainBG = holderWin.GetChildByIndex(1);
+        if (mainBG != null)
+        {
+            holderWin.DestroyChild(mainBG);
+            holderWin.DestroyChild(itemGridImage);
+        }
+
+        var vector2sortItemGridPosition = sortItemGrid.Position;
+        if (Config.Data.Clothes.RowCount >= 6 || CASPuck.gSingleton.mContentTypeFilter.mCells.Count <
+            GetFilterRowsFromClothingRows(Config.Data.Clothes.RowCount))
+        {
+            vector2sortItemGridPosition.y = 48 * TinyUIFix.Scale;
+        }
+        else
+        {
+            vector2sortItemGridPosition.y = 67 * TinyUIFix.Scale;
+        }
+
+        sortItemGrid.Position = vector2sortItemGridPosition;
+
+        FadeEffect existingFade = null;
+        foreach (var obj in holderWin.EffectList)
+        {
+            if (obj is FadeEffect fade)
             {
-                case 3:
-                    return 10;
-                case 4:
-                    return 15;
-                case 5:
-                    return 19;
-                default:
-                    return 24;
+                existingFade = fade;
+                break;
             }
         }
 
-        private static void SetContentTypeFilter()
+        if (existingFade != null)
         {
-            var holderWin = UIManager.GetMainWindow().GetChildByID(0x092ccf31, true) as Window;
-            var sortItemGrid = UIManager.GetMainWindow().GetChildByID(0x0b4fbf70, true) as ItemGrid;
-            var itemGridImage = sortItemGrid.GetChildByIndex(1);
-            var mainBG = holderWin.GetChildByIndex(1);
-            if (mainBG != null)
-            {
-                holderWin.DestroyChild(mainBG);
-                holderWin.DestroyChild(itemGridImage);
-            }
+            existingFade.Duration = 0.1f;
+        }
 
-            var vector2sortItemGridPosition = sortItemGrid.Position;
-            if (Config.Data.Clothes.Rows >= 6 || CASPuck.gSingleton.mContentTypeFilter.mCells.Count <
-                GetFilterRowsFromClothingRows(Config.Data.Clothes.Rows))
-            {
-                vector2sortItemGridPosition.y = 48 * TinyUIFix.Scale;
-            }
-            else
-            {
-                vector2sortItemGridPosition.y = 67 * TinyUIFix.Scale;
-            }
+        if (Config.Data.Clothes.RowCount < 6 && CASPuck.gSingleton.mContentTypeFilter.mCells.Count >
+            GetFilterRowsFromClothingRows(Config.Data.Clothes.RowCount))
+        {
+            sortItemGrid.mGrid.MouseWheel -= sortItemGrid.OnGridMouseWheel;
+            sortItemGrid.mGrid.MouseWheel += (_, e) => HandleMouseWheel(e, sortItemGrid);
+            sortItemGrid.mVScrollDownButton.Position = new Vector2(sortItemGrid.mVScrollDownButton.Position.x,
+                CASClothingCategory.gSingleton.ContainerGrid.mVScrollDownButton.Position.y);
+        }
 
-            sortItemGrid.Position = vector2sortItemGridPosition;
+        var desiredVisibleRows = GetFilterRowsFromClothingRows(Config.Data.Clothes.RowCount);
+        var visibleRowsSetting = GetVisibleRowsSetting(desiredVisibleRows);
 
-            FadeEffect existingFade = null;
-            foreach (var obj in holderWin.EffectList)
+        sortItemGrid.VisibleRows = (uint)visibleRowsSetting;
+
+        var baseItemGridHeight = -126f;
+        var baseMGridHeight = 0f;
+        var baseButtonY = 191f * TinyUIFix.Scale;
+
+        var itemGridHeight = baseItemGridHeight + (64f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
+        var mGridHeight = baseMGridHeight + (32f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
+        var buttonY = baseButtonY + (64f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
+
+        var itemGridArea = sortItemGrid.Area;
+        itemGridArea.Height = itemGridHeight;
+        sortItemGrid.Area = itemGridArea;
+
+        var vector2 = sortItemGrid.mVScrollDownButton.Position;
+        vector2.y = buttonY;
+        sortItemGrid.mVScrollDownButton.Position = vector2;
+
+        var gridArea = sortItemGrid.mGrid.Area;
+        gridArea.Height = mGridHeight;
+        sortItemGrid.mGrid.Area = gridArea;
+
+        var holderArea = holderWin.Area;
+        var originalWidth = holderArea.Width;
+        var columnWidth = 300f * TinyUIFix.Scale;
+        var extraWidth = columnWidth * (Config.Data.Clothes.ColumnCount - 1);
+        holderArea.Width = originalWidth + extraWidth - 30f * TinyUIFix.Scale;
+        holderWin.Area = holderArea;
+
+        sortItemGrid.UpdateGridSize();
+        sortItemGrid.UpdateScrollbar();
+
+        var cellButtons = new List<Button>();
+
+        foreach (var cellItem in sortItemGrid.Items)
+        {
+            var cell = cellItem.mWin as CatalogProductFilter.Cell;
+            if (cell != null)
             {
-                if (obj is FadeEffect fade)
+                var checkBox = cell.GetChildByID(1U, true) as Button;
+                if (checkBox != null)
                 {
-                    existingFade = fade;
-                    break;
-                }
-            }
-
-            if (existingFade != null)
-            {
-                existingFade.Duration = 0.1f;
-            }
-
-            if (Config.Data.Clothes.Rows < 6 && CASPuck.gSingleton.mContentTypeFilter.mCells.Count >
-                GetFilterRowsFromClothingRows(Config.Data.Clothes.Rows))
-            {
-                sortItemGrid.mGrid.MouseWheel -= sortItemGrid.OnGridMouseWheel;
-                sortItemGrid.mGrid.MouseWheel += (_, e) => HandleMouseWheel(e, sortItemGrid);
-                sortItemGrid.mVScrollDownButton.Position = new Vector2(sortItemGrid.mVScrollDownButton.Position.x,
-                    CASClothingCategory.gSingleton.ContainerGrid.mVScrollDownButton.Position.y);
-            }
-
-            var desiredVisibleRows = GetFilterRowsFromClothingRows(Config.Data.Clothes.Rows);
-            var visibleRowsSetting = GetVisibleRowsSetting(desiredVisibleRows);
-
-            sortItemGrid.VisibleRows = (uint)visibleRowsSetting;
-
-            var baseItemGridHeight = -126f;
-            var baseMGridHeight = 0f;
-            var baseButtonY = 191f * TinyUIFix.Scale;
-
-            var itemGridHeight = baseItemGridHeight + (64f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
-            var mGridHeight = baseMGridHeight + (32f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
-            var buttonY = baseButtonY + (64f * (sortItemGrid.VisibleRows - 5)) * TinyUIFix.Scale;
-
-            var itemGridArea = sortItemGrid.Area;
-            itemGridArea.Height = itemGridHeight;
-            sortItemGrid.Area = itemGridArea;
-
-            var vector2 = sortItemGrid.mVScrollDownButton.Position;
-            vector2.y = buttonY;
-            sortItemGrid.mVScrollDownButton.Position = vector2;
-
-            var gridArea = sortItemGrid.mGrid.Area;
-            gridArea.Height = mGridHeight;
-            sortItemGrid.mGrid.Area = gridArea;
-
-            var holderArea = holderWin.Area;
-            var originalWidth = holderArea.Width;
-            var columnWidth = 300f * TinyUIFix.Scale;
-            var extraWidth = columnWidth * (Config.Data.Clothes.Columns - 1);
-            holderArea.Width = originalWidth + extraWidth - 30f * TinyUIFix.Scale;
-            holderWin.Area = holderArea;
-
-            sortItemGrid.UpdateGridSize();
-            sortItemGrid.UpdateScrollbar();
-
-            var cellButtons = new List<Button>();
-
-            foreach (var cellItem in sortItemGrid.Items)
-            {
-                var cell = cellItem.mWin as CatalogProductFilter.Cell;
-                if (cell != null)
-                {
-                    var checkBox = cell.GetChildByID(1U, true) as Button;
-                    if (checkBox != null)
+                    cellButtons.Add(checkBox);
+                    if (Config.Data.Clothes.RowCount < 6)
                     {
-                        cellButtons.Add(checkBox);
-                        if (Config.Data.Clothes.Rows < 6)
-                        {
-                            checkBox.MouseWheel -= OnCellButtonMouseWheel;
-                            checkBox.MouseWheel += OnCellButtonMouseWheel;
-                        }
+                        checkBox.MouseWheel -= OnCellButtonMouseWheel;
+                        checkBox.MouseWheel += OnCellButtonMouseWheel;
                     }
                 }
             }
-
-            foreach (var button in cellButtons)
-            {
-                EffectManager.RemoveAllEffects(button);
-                EffectManager.AddScaleEffect(button, scale: 0.9f, duration: 0.1f);
-            }
-
-            EffectManager.AddGrowEffect(currentLayout, rightChange: 35f, duration: 0.1f,
-                triggerType: EffectBase.TriggerTypes.Manual);
-            EffectManager.AddGlideEffect(mDoneButton, offset: new Vector2(35f, 0f), duration: 0.1f,
-                triggerType: EffectBase.TriggerTypes.Manual);
-            CASPuck.gSingleton.mContentTypeFilter.VisibilityChange -= OnContentTypeFilterVisibilityChange;
-            CASPuck.gSingleton.mContentTypeFilter.VisibilityChange += OnContentTypeFilterVisibilityChange;
         }
 
-        private static void OnContentTypeFilterVisibilityChange(WindowBase sender,
-            UIVisibilityChangeEventArgs eventArgs)
+        foreach (var button in cellButtons)
         {
-            if (eventArgs.Visible)
-            {
-                if (currentLayout.Tag is GrowEffect grow)
-                {
-                    grow.TriggerEffect(false);
-                }
-
-                if (mDoneButton.Tag is GlideEffect glide)
-                {
-                    glide.TriggerEffect(false);
-                }
-            }
-            else
-            {
-                if (currentLayout.Tag is GrowEffect grow)
-                {
-                    grow.TriggerEffect(true);
-                }
-
-                if (mDoneButton.Tag is GlideEffect glide)
-                {
-                    glide.TriggerEffect(true);
-                }
-            }
+            EffectManager.RemoveAllEffects(button);
+            EffectManager.AddScaleEffect(button, scale: 0.9f, duration: 0.1f);
         }
 
-        private static void HandleMouseWheel(UIMouseEventArgs eventArgs, ItemGrid itemGrid)
+        EffectManager.AddGrowEffect(currentLayout, rightChange: 35f, duration: 0.1f,
+            triggerType: EffectBase.TriggerTypes.Manual);
+        EffectManager.AddGlideEffect(mDoneButton, offset: new Vector2(35f, 0f), duration: 0.1f,
+            triggerType: EffectBase.TriggerTypes.Manual);
+        CASPuck.gSingleton.mContentTypeFilter.VisibilityChange -= OnContentTypeFilterVisibilityChange;
+        CASPuck.gSingleton.mContentTypeFilter.VisibilityChange += OnContentTypeFilterVisibilityChange;
+    }
+
+    private static void OnContentTypeFilterVisibilityChange(WindowBase sender,
+        UIVisibilityChangeEventArgs eventArgs)
+    {
+        if (eventArgs.Visible)
         {
-            if (itemGrid == null) return;
-
-            var num = eventArgs.MouseWheelDelta / 100;
-            if (num == 0)
+            if (currentLayout.Tag is GrowEffect grow)
             {
-                num = ((eventArgs.MouseWheelDelta < 0) ? -1 : 1);
+                grow.TriggerEffect(false);
             }
 
-            var scrollbar = itemGrid.mbHorizontalScrolling ? itemGrid.mHScrollbar : itemGrid.mVScrollbar;
-            if (scrollbar == null) return;
-
-            if (itemGrid.mGrid.SmoothScrolling)
+            if (mDoneButton.Tag is GlideEffect glide)
             {
-                scrollbar.TargetValue -= num * (int)itemGrid.mScrollIncrement;
+                glide.TriggerEffect(false);
             }
-            else
-            {
-                scrollbar.Value -= num * (int)itemGrid.mScrollIncrement;
-                itemGrid.mGrid.ScrollUnits(
-                    itemGrid.mbHorizontalScrolling ? Grid.Orientation.Horizontal : Grid.Orientation.Vertical,
-                    -(num * (int)itemGrid.mScrollIncrement));
-            }
-
-            Simulator.AddObject(new OneShotFunctionTask(() =>
-            {
-                if (itemGrid.mVScrollUpButton != null)
-                    itemGrid.mVScrollUpButton.Visible =
-                        (itemGrid.Count > 0 && !itemGrid.mGrid.IsCellVisible(0, 0));
-                if (itemGrid.mVScrollDownButton != null)
-                    itemGrid.mVScrollDownButton.Visible =
-                        (itemGrid.Count >
-                         itemGrid.VisibleColumns * itemGrid.VisibleRows &&
-                         !itemGrid.mGrid.IsCellVisible(0, itemGrid.mGrid.RowCount - 1));
-            }, StopWatch.TickStyles.Seconds, 0.2f));
-
-            eventArgs.Handled = true;
         }
-
-
-        private static void OnCellButtonMouseWheel(WindowBase sender, UIMouseEventArgs e)
+        else
         {
-            var checkBox = sender as Button;
-            if (checkBox == null) return;
-
-            var cell = checkBox.Parent as CatalogProductFilter.Cell;
-            if (cell == null) return;
-
-            var cellItemWin = cell.Parent;
-            if (cellItemWin == null) return;
-
-            ItemGrid itemGrid = null;
-            var current = cellItemWin;
-            while (current != null)
+            if (currentLayout.Tag is GrowEffect grow)
             {
-                if (current is ItemGrid grid)
-                {
-                    itemGrid = grid;
-                    break;
-                }
-
-                current = current.Parent;
+                grow.TriggerEffect(true);
             }
 
-            if (itemGrid == null) return;
-            HandleMouseWheel(e, itemGrid);
+            if (mDoneButton.Tag is GlideEffect glide)
+            {
+                glide.TriggerEffect(true);
+            }
         }
+    }
 
-        private static void CareerButtonFix()
+    private static void HandleMouseWheel(UIMouseEventArgs eventArgs, ItemGrid itemGrid)
+    {
+        if (itemGrid == null) return;
+
+        var num = eventArgs.MouseWheelDelta / 100;
+        if (num == 0)
         {
-            var careerButton = currentLayout.GetChildByID(0x05dbc509, true) as Button;
-            careerButton.Visible = true;
-
-            var multiDrawable = careerButton.Drawable as MultiDrawable;
-            var buttonIconDrawable = multiDrawable[1U];
-            var iconDrawable = buttonIconDrawable as IconDrawable;
-            iconDrawable.Image = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("hud_icon_career_r2", 0U));
-            iconDrawable.Scale = 0.8f * TinyUIFix.Scale;
-            careerButton.Invalidate();
+            num = ((eventArgs.MouseWheelDelta < 0) ? -1 : 1);
         }
+
+        var scrollbar = itemGrid.mbHorizontalScrolling ? itemGrid.mHScrollbar : itemGrid.mVScrollbar;
+        if (scrollbar == null) return;
+
+        if (itemGrid.mGrid.SmoothScrolling)
+        {
+            scrollbar.TargetValue -= num * (int)itemGrid.mScrollIncrement;
+        }
+        else
+        {
+            scrollbar.Value -= num * (int)itemGrid.mScrollIncrement;
+            itemGrid.mGrid.ScrollUnits(
+                itemGrid.mbHorizontalScrolling ? Grid.Orientation.Horizontal : Grid.Orientation.Vertical,
+                -(num * (int)itemGrid.mScrollIncrement));
+        }
+
+        Simulator.AddObject(new OneShotFunctionTask(() =>
+        {
+            if (itemGrid.mVScrollUpButton != null)
+                itemGrid.mVScrollUpButton.Visible =
+                    (itemGrid.Count > 0 && !itemGrid.mGrid.IsCellVisible(0, 0));
+            if (itemGrid.mVScrollDownButton != null)
+                itemGrid.mVScrollDownButton.Visible =
+                    (itemGrid.Count >
+                     itemGrid.VisibleColumns * itemGrid.VisibleRows &&
+                     !itemGrid.mGrid.IsCellVisible(0, itemGrid.mGrid.RowCount - 1));
+        }, StopWatch.TickStyles.Seconds, 0.2f));
+
+        eventArgs.Handled = true;
+    }
+
+
+    private static void OnCellButtonMouseWheel(WindowBase sender, UIMouseEventArgs e)
+    {
+        var checkBox = sender as Button;
+        if (checkBox == null) return;
+
+        var cell = checkBox.Parent as CatalogProductFilter.Cell;
+        if (cell == null) return;
+
+        var cellItemWin = cell.Parent;
+        if (cellItemWin == null) return;
+
+        ItemGrid itemGrid = null;
+        var current = cellItemWin;
+        while (current != null)
+        {
+            if (current is ItemGrid grid)
+            {
+                itemGrid = grid;
+                break;
+            }
+
+            current = current.Parent;
+        }
+
+        if (itemGrid == null) return;
+        HandleMouseWheel(e, itemGrid);
+    }
+
+    private static void CareerButtonFix()
+    {
+        var careerButton = currentLayout.GetChildByID(0x05dbc509, true) as Button;
+        careerButton.Visible = true;
+
+        var multiDrawable = careerButton.Drawable as MultiDrawable;
+        var buttonIconDrawable = multiDrawable[1U];
+        var iconDrawable = buttonIconDrawable as IconDrawable;
+        iconDrawable.Image = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("hud_icon_career_r2", 0U));
+        iconDrawable.Scale = 0.8f * TinyUIFix.Scale;
+        careerButton.Invalidate();
     }
 }
