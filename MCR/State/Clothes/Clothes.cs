@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Arro.Common;
 using Sims3.SimIFace;
+using Sims3.SimIFace.CAS;
 using Sims3.UI;
 using Sims3.UI.CAS;
 using Sims3.UI.CAS.CAP;
@@ -18,7 +19,6 @@ namespace Arro.MCR
 
         public static void Hook()
         {
-            Log("Hook() Called");   
             GetCurrentLayout();
             SetClothesItemGrid();
             SetClothingBackgroundSize();
@@ -31,21 +31,6 @@ namespace Arro.MCR
             }
         }
 
-        private static void CreateLazyLoadingTask()
-        {
-            Log("CreateLazyLoadingTask() called");
-            try
-            {
-                Simulator.DestroyObject(LazyLoading.TaskGuid);
-            }
-            catch (Exception e)
-            {
-                Log(e);
-            }
-            LazyLoading.TaskGuid = Simulator.AddObject(new LazyLoadingHookTask());
-            Log("Created new task guid");
-        }
-
         public static void GetCurrentLayout()
         {
             if (CASClothing.sClothingLayout != null && CASDresserClothing.sClothingLayout == null &&
@@ -54,7 +39,8 @@ namespace Arro.MCR
                 currentLayout = CASClothing.gSingleton;
                 if (Config.Data.Clothes.SmoothPatch)
                 {
-                    CreateLazyLoadingTask();
+                    LazyLoading.CreateLazyLoadingTask();
+                    LazyLoading.HookCASClothingOrCAPAccessories();
                 }
             }
             else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout != null &&
@@ -63,7 +49,8 @@ namespace Arro.MCR
                 currentLayout = CASDresserClothing.gSingleton;
                 if (Config.Data.Clothes.SmoothPatch)
                 {
-                    CreateLazyLoadingTask();
+                    LazyLoading.CreateLazyLoadingTask();
+                    LazyLoading.HookCASDresser();
                 }
             }
             else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout == null &&
@@ -72,8 +59,50 @@ namespace Arro.MCR
                 currentLayout = CAPAccessories.gSingleton;
                 if (Config.Data.Clothes.SmoothPatch)
                 {
-                    CreateLazyLoadingTask();
+                    LazyLoading.CreateLazyLoadingTask();
+                    LazyLoading.HookCASClothingOrCAPAccessories();
                 }
+            }
+            CASClothingCategory gSingleton2 = CASClothingCategory.gSingleton;
+            {
+                CatalogProductFilter mContentTypeFilter = gSingleton2.mContentTypeFilter;
+                mContentTypeFilter.FiltersChanged = (VoidEventHandler)Delegate.Remove(mContentTypeFilter.FiltersChanged,
+                    new VoidEventHandler(gSingleton2.PopulateTypesGrid));
+                gSingleton2.mTopsButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mBottomsButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mShoesButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mOutfitsButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mAccessoriesButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mHorseBridlesButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.mHorseSaddleButton.Click -= gSingleton2.OnCategoryButtonClick;
+                gSingleton2.FadeTransitionFinished -= gSingleton2.OnFadeFinished;
+                CatalogProductFilter mContentTypeFilter2 = gSingleton2.mContentTypeFilter;
+                mContentTypeFilter2.FiltersChanged =
+                    (VoidEventHandler)Delegate.Remove(mContentTypeFilter2.FiltersChanged,
+                        new VoidEventHandler(LazyLoading.HookedPopulateTypesGrid));
+                gSingleton2.mTopsButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mBottomsButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mShoesButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mOutfitsButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mAccessoriesButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mHorseBridlesButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mHorseSaddleButton.Click -= LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.FadeTransitionFinished -= LazyLoading.HookedOnFadeFinished;
+                CatalogProductFilter mContentTypeFilter3 = gSingleton2.mContentTypeFilter;
+                mContentTypeFilter3.FiltersChanged =
+                    (VoidEventHandler)Delegate.Combine(mContentTypeFilter3.FiltersChanged,
+                        new VoidEventHandler(LazyLoading.HookedPopulateTypesGrid));
+                gSingleton2.mTopsButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mBottomsButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mShoesButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mOutfitsButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mAccessoriesButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mHorseBridlesButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.mHorseSaddleButton.Click += LazyLoading.HookedOnCategoryButtonClick;
+                gSingleton2.FadeTransitionFinished += LazyLoading.HookedOnFadeFinished;
+                LazyLoading.layoutKey = ResourceKey.CreateUILayoutKey("CASClothingRow", 0U);
+                LazyLoading.placeHolderRow = (UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID(1) as CASClothingRow);
+                LazyLoading.placeHolderRow.Visible = false;
             }
         }
 

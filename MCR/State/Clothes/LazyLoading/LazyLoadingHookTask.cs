@@ -1,5 +1,4 @@
-﻿using System;
-using Arro.Common;
+﻿using Arro.Common;
 using Sims3.SimIFace;
 using Sims3.UI;
 using Sims3.UI.CAS;
@@ -12,39 +11,26 @@ namespace Arro.MCR
         
         public override void Simulate()
         {
-            // DZIAŁAJ TYLKO W CAS
+            //Only in CAS
             if (!Responder.Instance.InCasMode) 
             {
                 if (hookedCASClothingCategory)
                 {
+                    Logger.Log("CASClothingCategoryUnHook1");
                     LazyLoading.CASClothingCategoryUnHook();
                     hookedCASClothingCategory = false;
                 }
                 return;
             }
             
-            Logger.Log("ticking");
-            
-            // Tick systemu leniwego ładowania
-            LazyLoading.Tick();
-            
-            // Sprawdź czy istnieje ClothingCategory
+            //Is clothing category null?
             CASClothingCategory gSingleton = CASClothingCategory.gSingleton;
             if (gSingleton == null) 
             {
-                if (hookedCASClothingCategory)
-                {
+                    Logger.Log("CASClothingCategoryUnHook");
                     LazyLoading.CASClothingCategoryUnHook();
                     hookedCASClothingCategory = false;
-                }
                 return;
-            }
-            
-            // Podepnij hooka jeśli jeszcze nie podpięty
-            if (!hookedCASClothingCategory)
-            {
-                LazyLoading.CASClothingCategoryHook();
-                hookedCASClothingCategory = true;
             }
             
             if (gSingleton.mClothingTypesGrid != null &&
