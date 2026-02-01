@@ -46,42 +46,11 @@
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\Common\Common\Attributes\Cache.cs">
-      <Link>Common\Attributes\Cache.cs</Link>
+    <Compile Include="..\..\Common\Common\**\*.cs">
+      <Link>Common\%(RecursiveDir)%(FileName)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\..\Common\Common\Attributes\ExtensionAttribute.cs">
-      <Link>Common\Attributes\ExtensionAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\Attributes\GetAssembly.cs">
-      <Link>Common\Attributes\GetAssembly.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\Attributes\InvokeOnWorldEvent.cs">
-      <Link>Common\Attributes\InvokeOnWorldEvent.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\Attributes\RegisterCommand.cs">
-      <Link>Common\Attributes\RegisterCommand.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\Debugging\Logger\Console.cs">
-      <Link>Common\Debugging\Logger\Console.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\Debugging\Logger\Logger.cs">
-      <Link>Common\Debugging\Logger\Logger.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\ExtensionMethods\ObjectGuidExtensions.cs">
-      <Link>Common\ExtensionMethods\ObjectGuidExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\ExtensionMethods\WindowExtensions.cs">
-      <Link>Common\ExtensionMethods\WindowExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\Main.cs">
-      <Link>Common\Main.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\UI\TinyUIFix\TinyUIFix.cs">
-      <Link>Common\UI\TinyUIFix\TinyUIFix.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Common\Common\UI\EffectManager\EffectManager.cs">
-      <Link>Common\UI\UIEffectManager\EffectManager.cs</Link>
-    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="CASHook.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Main.cs" />
@@ -125,9 +94,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="..\..\Common\Common\UI\">
-      <Link>Common\Ui</Link>
-    </Folder>
     <Folder Include="State\Face\" />
     <Folder Include="State\Hair\" />
   </ItemGroup>
