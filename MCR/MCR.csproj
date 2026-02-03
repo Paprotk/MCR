@@ -43,7 +43,6 @@
     <Optimize>True</Optimize>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <DefineConstants>TRACE</DefineConstants>
-    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Common\Common\**\*.cs">
@@ -51,7 +50,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CASHook.cs" />
+    <Compile Include="CASHookTask.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -93,13 +92,9 @@
       <HintPath>..\..\DLLS\UI_MCR.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="State\Face\" />
-    <Folder Include="State\Hair\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <Version>2.1</Version>
+    <Version>2.2</Version>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>"$(SolutionDir)Tools\ts3buildtool.exe" -modName="Arro_$(ProjectName)_$(Version)" -dllPath="$(TargetPath)" -defaultPath="Packages\Arro" -skip="New Folder"</PostBuildEvent>

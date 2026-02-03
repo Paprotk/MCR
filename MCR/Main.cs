@@ -1,8 +1,8 @@
 ﻿using Sims3.SimIFace;
 using Sims3.UI;
 using System;
+using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Arro.Common;
 using Sims3.UI.CAS;
 using Simulator = Sims3.SimIFace.Simulator;
@@ -38,8 +38,10 @@ public class Main
     {
         if (Sims3.Gameplay.UI.Responder.Instance != null)
         {
+            Sims3.Gameplay.UI.Responder.Instance.GameStateChanging -= OnGameStateChanged;
             Sims3.Gameplay.UI.Responder.Instance.GameStateChanging += OnGameStateChanged;
         }
+
         if (LD_SmoothPatch != null) DestroyLDTask();
     }
 
@@ -74,7 +76,19 @@ public class Main
         if (!Config.Data.Clothes.SmoothPatchEnabled) return;
         LazyLoading.TaskGuid.Dispose();
     }
-
+    
+    [RegisterCommand("mcr", "Usage: mcr rows columns")]
+    private static int mcr(object[] parameters)
+    {
+        if (parameters != null && parameters.Length > 0)
+        {
+            Config.Data.Clothes.RowCount = (int)parameters[0];
+            Config.Data.Clothes.ColumnCount = (int)parameters[1];
+            Logger.Log($"Set row count to {parameters[0]} and column count to {parameters[1]}");
+            CASHookTask.SetBool(false,false,false);
+        }
+        return 1;
+    }
     internal static void OnGameStateChanged(Responder.GameSubState previousState, Responder.GameSubState newState)
     {
         if (newState == Responder.GameSubState.CASFullMode || newState == Responder.GameSubState.CASMirrorMode ||
@@ -84,13 +98,11 @@ public class Main
             newState == Responder.GameSubState.CASSurgeryFaceMode ||
             newState == Responder.GameSubState.CASSurgeryBodyMode)
         {
-            CASHook = Simulator.AddObject(new CASHook());
+            Simulator.AddObject(new OneShotFunctionTask(() => { CASHook = Simulator.AddObject(new CASHookTask()); }, StopWatch.TickStyles.Seconds, 1f));
         }
         else
         {
             CASHook.Dispose();
-            if (!Config.Data.Clothes.SmoothPatchEnabled) return;
-            LazyLoading.TaskGuid.Dispose();
         }
     }
 

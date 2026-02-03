@@ -1,4 +1,5 @@
 using System;
+using Arro.Common;
 using Sims3.Gameplay.Abstracts;
 using Sims3.Gameplay.Utilities;
 
@@ -29,6 +30,8 @@ public class Config
                     Data.Clothes.CompactModeClothesEnabled = xmlDbRow.GetBool("CompactModeClothes");
                     Data.Clothes.CompactModeAccessoriesEnabled = xmlDbRow.GetBool("CompactModeAccessories");
                 }
+                Logger.Log(
+                    $"[ClothesModule] Configuration initialized: Size=[{Data.Clothes.RowCount}x{Data.Clothes.ColumnCount}], SmoothPatch={Data.Clothes.SmoothPatchEnabled}, Compact(C/A)={Data.Clothes.CompactModeClothesEnabled}/{Data.Clothes.CompactModeAccessoriesEnabled}");
             }
         }
         var hair = XmlDbData.ReadData("MCRHair");
@@ -53,6 +56,7 @@ public class Config
     public static bool ClothesModuleInstalled { get; set; }
     public static bool HairModuleInstalled { get; set; }
     public static bool FaceModuleInstalled { get; set; }
+    
 
     public static class Data
     {

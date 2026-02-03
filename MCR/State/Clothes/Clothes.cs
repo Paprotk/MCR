@@ -447,4 +447,14 @@ public class Clothes
         iconDrawable.Scale = 0.8f * TinyUIFix.Scale;
         careerButton.Invalidate();
     }
+
+    public static void Cleanup()
+    {
+        if (mDoneButton != null)
+        {
+            mDoneButton.Click -= OnDoneButtonClick;
+        }
+        currentLayout = null;
+        mDoneButton = null;
+    }
 }
