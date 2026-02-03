@@ -1,16 +1,21 @@
-﻿using Sims3.SimIFace;
+﻿using Arro.Common;
+using Sims3.SimIFace;
 using Sims3.UI;
 using Sims3.UI.CAS;
 using Sims3.UI.CAS.CAP;
 
 namespace Arro.MCR;
 
-public class CASHook : Task
+public class CASHookTask : Task
 {
     public static bool isClothesProcessing;
     public static bool isFaceProcessing;
     public static bool isHairProcessing;
-        
+
+    public CASHookTask()
+    {
+        Logger.Log("CASHookTask created");
+    }
     public override void Simulate()
     {
         if (!Responder.Instance.InCasMode) return;
@@ -44,7 +49,13 @@ public class CASHook : Task
             SetBool(false, false, false);
         }
     }
-        
+
+    public override void Dispose()
+    {
+        Logger.Log("CASHookTask disposed");
+        Clothes.Cleanup();
+    }
+
     public static void SetBool(bool clothes, bool face, bool hair)
     {
         isClothesProcessing = clothes;
