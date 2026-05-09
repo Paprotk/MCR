@@ -4,9 +4,17 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using Arro.Common;
+using ScriptCore;
+using Sims3.Gameplay.Actors;
 using Sims3.UI.CAS;
+using Sims3.UI.Hud;
 using Simulator = Sims3.SimIFace.Simulator;
 using static Arro.Common.Logger;
+using Animation = Sims3.SimIFace.Animation;
+using Event = Arro.Common.Event;
+using GameUtils = Sims3.SimIFace.GameUtils;
+using OnlineFeatures = Sims3.SimIFace.OnlineFeatures;
+using StopWatch = Sims3.SimIFace.StopWatch;
 
 namespace Arro.MCR;
 
@@ -16,6 +24,8 @@ public class Main
 
     [GetAssembly("LazyDuchess.SmoothPatch")]
     public static Assembly LD_SmoothPatch;
+    
+    public static string ModVersion = "V2.2";
 
     [Tunable]
 #pragma warning disable CS0169 // Field is never used
@@ -41,7 +51,6 @@ public class Main
             Sims3.Gameplay.UI.Responder.Instance.GameStateChanging -= OnGameStateChanged;
             Sims3.Gameplay.UI.Responder.Instance.GameStateChanging += OnGameStateChanged;
         }
-
         if (LD_SmoothPatch != null) DestroyLDTask();
     }
 
@@ -77,18 +86,6 @@ public class Main
         LazyLoading.TaskGuid.Dispose();
     }
     
-    [RegisterCommand("mcr", "Usage: mcr rows columns")]
-    private static int mcr(object[] parameters)
-    {
-        if (parameters != null && parameters.Length > 0)
-        {
-            Config.Data.Clothes.RowCount = (int)parameters[0];
-            Config.Data.Clothes.ColumnCount = (int)parameters[1];
-            Logger.Log($"Set row count to {parameters[0]} and column count to {parameters[1]}");
-            CASHookTask.SetBool(false,false,false);
-        }
-        return 1;
-    }
     internal static void OnGameStateChanged(Responder.GameSubState previousState, Responder.GameSubState newState)
     {
         if (newState == Responder.GameSubState.CASFullMode || newState == Responder.GameSubState.CASMirrorMode ||

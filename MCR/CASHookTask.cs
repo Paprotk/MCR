@@ -8,9 +8,9 @@ namespace Arro.MCR;
 
 public class CASHookTask : Task
 {
-    public static bool isClothesProcessing;
-    public static bool isFaceProcessing;
-    public static bool isHairProcessing;
+    public static bool IsClothesProcessing;
+    public static bool IsFaceProcessing;
+    public static bool IsHairProcessing;
 
     public CASHookTask()
     {
@@ -20,7 +20,7 @@ public class CASHookTask : Task
     {
         if (!Responder.Instance.InCasMode) return;
             
-        if (!isClothesProcessing && (CASClothing.gSingleton != null || CASDresserClothing.gSingleton != null || CAPAccessories.gSingleton != null))
+        if (!IsClothesProcessing && (CASClothing.gSingleton != null || CASDresserClothing.gSingleton != null || CAPAccessories.gSingleton != null))
         {
             SetBool(true, false, false);
             if (Config.ClothesModuleInstalled)
@@ -28,7 +28,7 @@ public class CASHookTask : Task
                 Clothes.Hook();
             }
         }
-        else if (!isFaceProcessing && CASFacialDetails.gSingleton != null)
+        else if (!IsFaceProcessing && CASFacialDetails.gSingleton != null)
         {
             SetBool(false, true, false);
             if (Config.FaceModuleInstalled)
@@ -36,7 +36,7 @@ public class CASHookTask : Task
                 //Face.Hook;
             }
         }
-        else if (!isHairProcessing && CASPhysical.gSingleton != null)
+        else if (!IsHairProcessing && CASPhysical.gSingleton != null)
         {
             SetBool(false, false, true);
             if (Config.HairModuleInstalled)
@@ -58,8 +58,8 @@ public class CASHookTask : Task
 
     public static void SetBool(bool clothes, bool face, bool hair)
     {
-        isClothesProcessing = clothes;
-        isFaceProcessing = face;
-        isHairProcessing = hair;
+        IsClothesProcessing = clothes;
+        IsFaceProcessing = face;
+        IsHairProcessing = hair;
     }
 }

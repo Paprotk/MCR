@@ -1,11 +1,10 @@
 using System;
 using Arro.Common;
-using Sims3.Gameplay.Abstracts;
 using Sims3.Gameplay.Utilities;
 
 namespace Arro.MCR;
 
-public class Config
+public abstract class Config
 {
     public static void Parse()
     {
@@ -20,12 +19,12 @@ public class Config
             clothes.Tables.TryGetValue("Config", out var xmlDbTable);
             if (xmlDbTable != null)
             {
-                const int MinRows = 3;
-                const int MinColumns = 1;
+                const int minRows = 3;
+                const int minColumns = 1;
                 foreach (var xmlDbRow in xmlDbTable.Rows)
                 {
-                    Data.Clothes.RowCount = Math.Max(MinRows, xmlDbRow.GetInt("Rows"));
-                    Data.Clothes.ColumnCount = Math.Max(MinColumns, xmlDbRow.GetInt("Columns"));
+                    Data.Clothes.RowCount = Math.Max(minRows, xmlDbRow.GetInt("Rows"));
+                    Data.Clothes.ColumnCount = Math.Max(minColumns, xmlDbRow.GetInt("Columns"));
                     Data.Clothes.SmoothPatchEnabled = xmlDbRow.GetBool("SmoothPatch");
                     Data.Clothes.CompactModeClothesEnabled = xmlDbRow.GetBool("CompactModeClothes");
                     Data.Clothes.CompactModeAccessoriesEnabled = xmlDbRow.GetBool("CompactModeAccessories");

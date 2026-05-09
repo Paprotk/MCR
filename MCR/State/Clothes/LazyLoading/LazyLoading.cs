@@ -45,19 +45,19 @@ public class LazyLoadingHookTask : Task
     {
         Logger.Log("LazyLoadingHookTask disposed");
         LazyLoading.ClearWornParts();
-        LazyLoading.placeHolderRow?.Dispose();
+        LazyLoading.PlaceHolderRow?.Dispose();
     }
 }
 
 public static class LazyLoading
 {
     public static ObjectGuid TaskGuid;
-    public static ResourceKey layoutKey;
-    public static CASClothingRow placeHolderRow;
-    private static Dictionary<BodyTypes, List<CASPart>> wornParts = new Dictionary<BodyTypes, List<CASPart>>();
-    private static Dictionary<ResourceKey, string> wornPresets = new Dictionary<ResourceKey, string>();
-    public static ArrayList partList = new ArrayList();
-    private static Dictionary<string, int> LoadedItems = new Dictionary<string, int>();
+    public static ResourceKey LayoutKey;
+    public static CASClothingRow PlaceHolderRow;
+    private static Dictionary<BodyTypes, List<CASPart>> _wornParts = new Dictionary<BodyTypes, List<CASPart>>();
+    private static Dictionary<ResourceKey, string> _wornPresets = new Dictionary<ResourceKey, string>();
+    public static ArrayList PartList = new ArrayList();
+    private static Dictionary<string, int> _loadedItems = new Dictionary<string, int>();
 
     public static void InitializeLazyLoading()
     {
@@ -71,7 +71,7 @@ public static class LazyLoading
         }
 
         TaskGuid = Simulator.AddObject(new LazyLoadingHookTask());
-        if (Clothes.currentLayout == CASDresserClothing.gSingleton)
+        if (CASDresserClothing.gSingleton != null)
         {
             HookCASDresser();
         }
@@ -117,10 +117,10 @@ public static class LazyLoading
             gSingleton2.mHorseBridlesButton.Click += LazyLoading.HookedOnCategoryButtonClick;
             gSingleton2.mHorseSaddleButton.Click += LazyLoading.HookedOnCategoryButtonClick;
             gSingleton2.FadeTransitionFinished += LazyLoading.HookedOnFadeFinished;
-            LazyLoading.layoutKey = ResourceKey.CreateUILayoutKey("CASClothingRow", 0U);
-            LazyLoading.placeHolderRow =
-                UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID<CASClothingRow>(1);
-            LazyLoading.placeHolderRow.Visible = false;
+            LazyLoading.LayoutKey = ResourceKey.CreateUILayoutKey("CASClothingRow", 0U);
+            LazyLoading.PlaceHolderRow =
+                UIManager.LoadLayout(LazyLoading.LayoutKey).GetWindowByExportID<CASClothingRow>(1);
+            LazyLoading.PlaceHolderRow.Visible = false;
         }
     }
 
@@ -431,19 +431,19 @@ public static class LazyLoading
         foreach (object obj in Enum.GetValues(typeof(BodyTypes)))
         {
             List<CASPart> list = Responder.Instance.CASModel.GetWornParts((BodyTypes)obj);
-            wornParts[(BodyTypes)obj] = list;
+            _wornParts[(BodyTypes)obj] = list;
             foreach (CASPart caspart in list)
             {
                 string designPreset = Responder.Instance.CASModel.GetDesignPreset(caspart);
-                wornPresets[caspart.Key] = designPreset;
+                _wornPresets[caspart.Key] = designPreset;
             }
         }
     }
 
     public static void ClearWornParts()
     {
-        wornParts.Clear();
-        wornPresets.Clear();
+        _wornParts.Clear();
+        _wornPresets.Clear();
     }
 
     private static void SetItem(ItemGrid itemGrid, ItemGridCellItem item, int row)
@@ -508,15 +508,15 @@ public static class LazyLoading
                 Simulator.LoadXMLString(new ResourceKey(caspart.Key.InstanceId, 53690476U, caspart.Key.GroupId));
             CASPartPreset caspartPreset = new CASPartPreset(caspart, text);
             CASPart caspart2 = default(CASPart);
-            if (wornParts.ContainsKey(caspart.BodyType) && wornParts[caspart.BodyType].Count > 0)
+            if (_wornParts.ContainsKey(caspart.BodyType) && _wornParts[caspart.BodyType].Count > 0)
             {
-                caspart2 = wornParts[caspart.BodyType][0];
+                caspart2 = _wornParts[caspart.BodyType][0];
             }
 
             string text2 = string.Empty;
-            if (wornPresets.ContainsKey(caspart2.Key))
+            if (_wornPresets.ContainsKey(caspart2.Key))
             {
-                text2 = wornPresets[caspart2.Key];
+                text2 = _wornPresets[caspart2.Key];
             }
 
             bool flag = true;
@@ -623,9 +623,9 @@ public static class LazyLoading
 
                 if (row.AddPresetGridItem(preset, orderIndex, preset.mPresetId))
                 {
-                    if (wornParts.ContainsKey(part.BodyType))
+                    if (_wornParts.ContainsKey(part.BodyType))
                     {
-                        foreach (CASPart wornPart in wornParts[part.BodyType])
+                        foreach (CASPart wornPart in _wornParts[part.BodyType])
                         {
                             if (wornPart.Key == part.Key)
                             {
@@ -726,7 +726,7 @@ public static class LazyLoading
 
     public static void HookedPopulateTypesGrid()
     {
-        LoadedItems.Clear();
+        _loadedItems.Clear();
         CASClothingCategory gSingleton = CASClothingCategory.gSingleton;
         if (gSingleton == null)
         {
@@ -781,7 +781,7 @@ public static class LazyLoading
         gSingleton.mSortButton.Tag = false;
         mClothingTypesGrid.mPopulateCallback = null;
 
-        partList.Clear();
+        PartList.Clear();
         CacheWornParts();
 
         //Compact mode
@@ -807,7 +807,7 @@ public static class LazyLoading
 
                     if (currentGroup.Count == 3)
                     {
-                        partList.Add(currentGroup);
+                        PartList.Add(currentGroup);
                         currentGroup = new List<object>();
                     }
                 }
@@ -815,7 +815,7 @@ public static class LazyLoading
 
             if (currentGroup.Count > 0)
             {
-                partList.Add(currentGroup);
+                PartList.Add(currentGroup);
             }
         }
         else
@@ -824,7 +824,7 @@ public static class LazyLoading
             {
                 if (obj != null && CASPuck.GetContentTypeFilter().ObjectMatchesFilter(obj))
                 {
-                    partList.Add(obj);
+                    PartList.Add(obj);
                 }
             }
         }
@@ -835,9 +835,9 @@ public static class LazyLoading
         int currentItemIndex = 0;
         mClothingTypesGrid.mPopulating = true;
 
-        while (loadedCount < itemsPerPage && currentItemIndex < partList.Count)
+        while (loadedCount < itemsPerPage && currentItemIndex < PartList.Count)
         {
-            object obj = partList[currentItemIndex];
+            object obj = PartList[currentItemIndex];
             if (obj == null)
             {
                 break;
@@ -846,10 +846,10 @@ public static class LazyLoading
             int row = loadedCount / visibleColumns;
             int col = loadedCount % visibleColumns;
 
-            if (SetGridItemAtPosition(mClothingTypesGrid, obj, layoutKey,
+            if (SetGridItemAtPosition(mClothingTypesGrid, obj, LayoutKey,
                     null, row, col))
             {
-                LoadedItems[$"{row}_{col}"] = currentItemIndex;
+                _loadedItems[$"{row}_{col}"] = currentItemIndex;
                 loadedCount++;
             }
 
@@ -873,11 +873,11 @@ public static class LazyLoading
         {
             int row = loadedCount / visibleColumns;
             int col = loadedCount % visibleColumns;
-            LoadedItems[$"{row}_{col}"] = -1;
+            _loadedItems[$"{row}_{col}"] = -1;
             loadedCount++;
         }
 
-        int totalItems = partList.Count;
+        int totalItems = PartList.Count;
         int totalRows = (int)Math.Ceiling(totalItems / (double)visibleColumns);
 
         for (int row = visibleRows; row < totalRows; row++)
@@ -890,7 +890,7 @@ public static class LazyLoading
                 }
 
                 AddItem(mClothingTypesGrid,
-                    new ItemGridCellItem(placeHolderRow, null));
+                    new ItemGridCellItem(PlaceHolderRow, null));
             }
         }
 
@@ -924,28 +924,28 @@ public static class LazyLoading
             {
                 string key = $"{row}_{col}";
 
-                if (!LoadedItems.ContainsKey(key) ||
-                    LoadedItems[key] == -1)
+                if (!_loadedItems.ContainsKey(key) ||
+                    _loadedItems[key] == -1)
                 {
                     int itemIndex = (row * visibleColumns) + col;
 
-                    if (itemIndex < partList.Count)
+                    if (itemIndex < PartList.Count)
                     {
-                        object obj = partList[itemIndex];
+                        object obj = PartList[itemIndex];
                         if (obj != null)
                         {
                             if (SetGridItemAtPosition(
-                                    mClothingTypesGrid, obj, layoutKey,
+                                    mClothingTypesGrid, obj, LayoutKey,
                                     null, row, col))
                             {
-                                LoadedItems[key] = itemIndex;
+                                _loadedItems[key] = itemIndex;
                                 return;
                             }
                         }
                     }
                     else
                     {
-                        LoadedItems[key] = -2;
+                        _loadedItems[key] = -2;
                     }
                 }
             }
@@ -964,7 +964,7 @@ public static class LazyLoading
             if (current is List<object> group)
             {
                 CASClothingRow casclothingRow =
-                    UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID<CASClothingRow>(1);
+                    UIManager.LoadLayout(LazyLoading.LayoutKey).GetWindowByExportID<CASClothingRow>(1);
                 if (casclothingRow == null) return false;
                 casclothingRow.FadeIn(200, FakeFade.EaseType.EaseOut);
                 casclothingRow.RowController = gSingleton;
@@ -1037,7 +1037,7 @@ public static class LazyLoading
             {
                 CASPart caspart = (CASPart)current;
                 CASClothingRow casclothingRow =
-                    UIManager.LoadLayout(LazyLoading.layoutKey).GetWindowByExportID<CASClothingRow>(1);
+                    UIManager.LoadLayout(LazyLoading.LayoutKey).GetWindowByExportID<CASClothingRow>(1);
                 if (casclothingRow == null) return false;
                 casclothingRow.FadeIn(200, FakeFade.EaseType.EaseOut);
                 casclothingRow.UseEp5AsBaseContent = gSingleton.mIsEp5Base;
@@ -1102,68 +1102,6 @@ public static class LazyLoading
         }
 
         return result;
-    }
-
-    private static void UpdateScrollbar(ItemGrid grid, int VisibleRange = -1, int UpperBoundValue = -1)
-    {
-        if (UIManager.IsRunningDesigner)
-        {
-            if (grid.mHScrollLeftButton != null && grid.mHScrollRightButton != null)
-            {
-                grid.mHScrollbar.Visible = (grid.mbHorizontalScrolling && !grid.mbUseArrowsForScrolling);
-                grid.mVScrollbar.Visible = (!grid.mbHorizontalScrolling && !grid.mbUseArrowsForScrolling);
-                if (grid.mbHorizontalScrolling)
-                {
-                    grid.mHScrollLeftButton.Visible = grid.mbUseArrowsForScrolling;
-                    grid.mHScrollRightButton.Visible = grid.mbUseArrowsForScrolling;
-                    grid.mVScrollUpButton.Visible = false;
-                    grid.mVScrollDownButton.Visible = false;
-                    return;
-                }
-
-                grid.mHScrollLeftButton.Visible = false;
-                grid.mHScrollRightButton.Visible = false;
-                grid.mVScrollUpButton.Visible = grid.mbUseArrowsForScrolling;
-                grid.mVScrollDownButton.Visible = grid.mbUseArrowsForScrolling;
-                return;
-            }
-        }
-        else
-        {
-            Scrollbar scrollbar = grid.mbHorizontalScrolling ? grid.mHScrollbar : grid.mVScrollbar;
-            (grid.mbHorizontalScrolling ? grid.mVScrollbar : grid.mHScrollbar).Visible = false;
-            int num = 0;
-            int num2 = 0;
-            grid.mGrid.GetScrollMetrics(grid.mbHorizontalScrolling, ref num, ref num2, ref grid.mScrollIncrement);
-            scrollbar.UpperBoundValue = num2;
-            scrollbar.VisibleRange = num;
-            if (UpperBoundValue != -1)
-            {
-                scrollbar.UpperBoundValue = UpperBoundValue;
-            }
-
-            if (VisibleRange != -1)
-            {
-                scrollbar.VisibleRange = VisibleRange;
-            }
-
-            scrollbar.ArrowDelta = (int)grid.mScrollIncrement;
-            if (!grid.mbUseArrowsForScrolling)
-            {
-                grid.mHScrollLeftButton.Visible = false;
-                grid.mHScrollRightButton.Visible = false;
-                grid.mVScrollUpButton.Visible = false;
-                grid.mVScrollDownButton.Visible = false;
-                scrollbar.Visible = (num2 > num);
-                return;
-            }
-
-            if (!grid.mbTickEventRegisteredForScroll)
-            {
-                grid.Tick += grid.OnTickForUpdateScrollbar;
-                grid.mbTickEventRegisteredForScroll = true;
-            }
-        }
     }
 }
 

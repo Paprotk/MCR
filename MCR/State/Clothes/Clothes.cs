@@ -11,9 +11,9 @@ using UIManager = Sims3.UI.UIManager;
 
 namespace Arro.MCR;
 
-public class Clothes
+public abstract class Clothes
 {
-    public static Window currentLayout;
+    private static Window _currentLayout;
 
     public static void Hook()
     {
@@ -38,17 +38,17 @@ public class Clothes
         if (CASClothing.sClothingLayout != null && CASDresserClothing.sClothingLayout == null &&
             CAPAccessories.sCAPAccessoriesLayout == null)
         {
-            currentLayout = CASClothing.gSingleton;
+            _currentLayout = CASClothing.gSingleton;
         }
         else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout != null &&
                  CAPAccessories.sCAPAccessoriesLayout == null)
         {
-            currentLayout = CASDresserClothing.gSingleton;
+            _currentLayout = CASDresserClothing.gSingleton;
         }
         else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout == null &&
                  CAPAccessories.sCAPAccessoriesLayout != null)
         {
-            currentLayout = CAPAccessories.gSingleton;
+            _currentLayout = CAPAccessories.gSingleton;
         }
     }
 
@@ -94,7 +94,7 @@ public class Clothes
             CASClothingCategory.gSingleton.mDesignButton.Visible = false;
         }
 
-        if (currentLayout == CAPAccessories.gSingleton) return;
+        if (_currentLayout == CAPAccessories.gSingleton) return;
 
         var topButtons = new[]
         {
@@ -122,7 +122,7 @@ public class Clothes
             }
         }
 
-        if (currentLayout != CASClothing.gSingleton) return;
+        if (_currentLayout != CASClothing.gSingleton) return;
 
         var casClothingSideButtons = new[]
         {
@@ -158,43 +158,43 @@ public class Clothes
         }
     }
 
-    public static Button mDoneButton;
+    public static Button DoneButton;
 
     public static void MoveDoneButton()
     {
-        if (currentLayout == null) return;
+        if (_currentLayout == null) return;
         //                                                     true          false
-        var buttonId = (currentLayout is CAPAccessories) ? 2095900161U : 98278400U;
-        mDoneButton = currentLayout.GetChildByID<Button>(buttonId);
+        var buttonId = (_currentLayout is CAPAccessories) ? 2095900161U : 98278400U;
+        DoneButton = _currentLayout.GetChildByID<Button>(buttonId);
 
-        if (mDoneButton == null) return;
+        if (DoneButton == null) return;
         //                                                    true   false
-        var startX = (currentLayout is CAPAccessories) ? 353f : -8f;
-        var startY = (currentLayout is CAPAccessories) ? 35f : 6f;
+        var startX = (_currentLayout is CAPAccessories) ? 353f : -8f;
+        var startY = (_currentLayout is CAPAccessories) ? 35f : 6f;
         
         var extraWidth = 300f * (Config.Data.Clothes.ColumnCount - 1);
     
-        mDoneButton.SetPosition(startX + extraWidth, startY);
+        DoneButton.SetPosition(startX + extraWidth, startY);
 
-        mDoneButton.Click -= OnDoneButtonClick;
-        mDoneButton.Click += OnDoneButtonClick;
-        EffectManager.AddScaleEffect(mDoneButton, scale: 1.05f, duration: 0.1f);
+        DoneButton.Click -= OnDoneButtonClick;
+        DoneButton.Click += OnDoneButtonClick;
+        EffectManager.AddScaleEffect(DoneButton, scale: 1.05f, duration: 0.1f);
     }
 
     private static void OnDoneButtonClick(WindowBase sender, UIButtonClickEventArgs eventArgs)
     {
-        mDoneButton.Click -= OnDoneButtonClick;
+        DoneButton.Click -= OnDoneButtonClick;
         LazyLoading.TaskGuid.Dispose();
     }
     
     public static void SetClothingBackgroundSize()
     {
-        if (currentLayout == null) return;
+        if (_currentLayout == null) return;
         
         var height = 534f + (139f * (Config.Data.Clothes.RowCount - 3));
         var width = 300f * Config.Data.Clothes.ColumnCount + 109f;
         
-        currentLayout.SetSize(width, height);
+        _currentLayout.SetSize(width, height);
     }
 
     private static int GetVisibleRowsSetting(int desiredActualRows)
@@ -224,25 +224,25 @@ public class Clothes
         var holderWin = UIManager.GetMainWindow().GetChildByID<Window>(0x092ccf31);
         var sortItemGrid = UIManager.GetMainWindow().GetChildByID<ItemGrid>(0x0b4fbf70);
         var itemGridImage = sortItemGrid.GetChildByIndex(1);
-        var mainBG = holderWin.GetChildByIndex(1);
-        if (mainBG != null)
+        var mainBg = holderWin.GetChildByIndex(1);
+        if (mainBg != null)
         {
-            holderWin.DestroyChild(mainBG);
+            holderWin.DestroyChild(mainBg);
             holderWin.DestroyChild(itemGridImage);
         }
 
-        var vector2sortItemGridPosition = sortItemGrid.Position;
+        var vector2SortItemGridPosition = sortItemGrid.Position;
         if (Config.Data.Clothes.RowCount >= 6 || CASPuck.gSingleton.mContentTypeFilter.mCells.Count <
             GetFilterRowsFromClothingRows(Config.Data.Clothes.RowCount))
         {
-            vector2sortItemGridPosition.y = 48 * TinyUIFix.Scale;
+            vector2SortItemGridPosition.y = 48 * TinyUIFix.Scale;
         }
         else
         {
-            vector2sortItemGridPosition.y = 67 * TinyUIFix.Scale;
+            vector2SortItemGridPosition.y = 67 * TinyUIFix.Scale;
         }
 
-        sortItemGrid.Position = vector2sortItemGridPosition;
+        sortItemGrid.Position = vector2SortItemGridPosition;
 
         FadeEffect existingFade = null;
         foreach (var obj in holderWin.EffectList)
@@ -329,9 +329,9 @@ public class Clothes
             EffectManager.AddScaleEffect(button, scale: 0.9f, duration: 0.1f);
         }
 
-        EffectManager.AddGrowEffect(currentLayout, rightChange: 35f, duration: 0.1f,
+        EffectManager.AddGrowEffect(_currentLayout, rightChange: 35f, duration: 0.1f,
             triggerType: EffectBase.TriggerTypes.Manual);
-        EffectManager.AddGlideEffect(mDoneButton, offset: new Vector2(35f, 0f), duration: 0.1f,
+        EffectManager.AddGlideEffect(DoneButton, offset: new Vector2(35f, 0f), duration: 0.1f,
             triggerType: EffectBase.TriggerTypes.Manual);
         CASPuck.gSingleton.mContentTypeFilter.VisibilityChange -= OnContentTypeFilterVisibilityChange;
         CASPuck.gSingleton.mContentTypeFilter.VisibilityChange += OnContentTypeFilterVisibilityChange;
@@ -342,24 +342,24 @@ public class Clothes
     {
         if (eventArgs.Visible)
         {
-            if (currentLayout.Tag is GrowEffect grow)
+            if (_currentLayout.Tag is GrowEffect grow)
             {
                 grow.TriggerEffect(false);
             }
 
-            if (mDoneButton.Tag is GlideEffect glide)
+            if (DoneButton.Tag is GlideEffect glide)
             {
                 glide.TriggerEffect(false);
             }
         }
         else
         {
-            if (currentLayout.Tag is GrowEffect grow)
+            if (_currentLayout.Tag is GrowEffect grow)
             {
                 grow.TriggerEffect(true);
             }
 
-            if (mDoneButton.Tag is GlideEffect glide)
+            if (DoneButton.Tag is GlideEffect glide)
             {
                 glide.TriggerEffect(true);
             }
@@ -437,24 +437,24 @@ public class Clothes
 
     private static void CareerButtonFix()
     {
-        var careerButton = currentLayout.GetChildByID<Button>(0x05dbc509);
+        var careerButton = _currentLayout.GetChildByID<Button>(0x05dbc509);
         careerButton.Visible = true;
 
         var multiDrawable = careerButton.Drawable as MultiDrawable;
-        var buttonIconDrawable = multiDrawable[1U];
+        var buttonIconDrawable = multiDrawable?[1U];
         var iconDrawable = buttonIconDrawable as IconDrawable;
-        iconDrawable.Image = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("hud_icon_career_r2", 0U));
-        iconDrawable.Scale = 0.8f * TinyUIFix.Scale;
+        iconDrawable?.Image = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("hud_icon_career_r2", 0U));
+        iconDrawable?.Scale = 0.8f * TinyUIFix.Scale;
         careerButton.Invalidate();
     }
 
     public static void Cleanup()
     {
-        if (mDoneButton != null)
+        if (DoneButton != null)
         {
-            mDoneButton.Click -= OnDoneButtonClick;
+            DoneButton.Click -= OnDoneButtonClick;
         }
-        currentLayout = null;
-        mDoneButton = null;
+        _currentLayout = null;
+        DoneButton = null;
     }
 }
