@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" ?>
+<TEXT>
+    <KEY>Arro/MCR/InvalidGridConfigurationTitle</KEY>
+    <STR>Nieprawidłowa konfiguracja siatki</STR>
+    <KEY>Arro/MCR/InvalidGridConfigurationMessage</KEY>
+    <STR>Siatka musi mieć co najmniej 3 wiersze i 1 kolumnę, aby wyświetlać się poprawnie.</STR>
+    <KEY>Arro/MCR/ConfigureGrid</KEY>
+    <STR>Konfiguruj siatkę</STR>
+    <KEY>Arro/MCR/RowCount</KEY>
+    <STR>Liczba wierszy</STR>
+    <KEY>Arro/MCR/ColumnCount</KEY>
+    <STR>Liczba kolumn</STR>
+    <KEY>Arro/MCR/EnableSmoothpatchFeatures</KEY>
+    <STR>Włącz funkcje Smooth Patch</STR>
+    <KEY>Arro/MCR/EnableSmoothpatchFeaturesTooltip</KEY>
+    <STR>Optymalizuje interfejs poprzez dynamiczne ładowanie elementów podczas przewijania, co znacznie zwiększa płynność działania katalogu.</STR>
+    <KEY>Arro/MCR/CompactModeClothes</KEY>
+    <STR>Tryb kompaktowy dla ubrań</STR>
+    <KEY>Arro/MCR/CompactModeClothesTooltip</KEY>
+    <STR>Zamiast wyświetlać jedno ubranie i jego warianty kolorystyczne, w te miejsca wstawiane są inne, osobne ubrania. Dzięki temu w jednym rzędzie widzisz więcej unikalnych rzeczy zamiast wielu kolorów tego samego modelu.</STR>
+    <KEY>Arro/MCR/CompactModeAccessories</KEY>
+    <STR>Tryb kompaktowy dla akcesoriów</STR>
+    <KEY>Arro/MCR/CompactModeAccessoriesTooltip</KEY>
+    <STR>Zamiast wyświetlać jedno akcesorium i jego warianty kolorystyczne, w te miejsca wstawiane są inne, osobne przedmioty. Dzięki temu w jednym rzędzie widzisz więcej unikalnych rzeczy zamiast wielu kolorów tego samego modelu.</STR>
+    <KEY>Arro/MCR/EnableAnimations</KEY>
+    <STR>Animacja przewijania</STR>
+    <KEY>Arro/MCR/EnableAnimationsTooltip</KEY>
+    <STR>Dodaje płynny efekt pojawiania się ikon podczas przeglądania katalogu.</STR>
+</TEXT>

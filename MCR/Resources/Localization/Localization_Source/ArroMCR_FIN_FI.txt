@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" ?>
+<TEXT>
+    <KEY>Arro/MCR/InvalidGridConfigurationTitle</KEY>
+    <STR>Invalid Grid Configuration</STR>
+    <KEY>Arro/MCR/InvalidGridConfigurationMessage</KEY>
+    <STR>The grid must have at least 3 rows and 1 column to display correctly.</STR>
+    <KEY>Arro/MCR/ConfigureGrid</KEY>
+    <STR>Configure Grid</STR>
+    <KEY>Arro/MCR/RowCount</KEY>
+    <STR>Row Count</STR>
+    <KEY>Arro/MCR/ColumnCount</KEY>
+    <STR>Column Count</STR>
+    <KEY>Arro/MCR/EnableSmoothpatchFeatures</KEY>
+    <STR>Enable Smooth Patch Features</STR>
+    <KEY>Arro/MCR/EnableSmoothpatchFeaturesTooltip</KEY>
+    <STR>Optimizes the interface by loading items dynamically as you scroll, making the catalog much more responsive.</STR>
+    <KEY>Arro/MCR/CompactModeClothes</KEY>
+    <STR>Compact Mode For Clothing</STR>
+    <KEY>Arro/MCR/CompactModeClothesTooltip</KEY>
+    <STR>Instead of showing one clothing item and its color swatches, it places different pieces of clothing in those slots. This lets you see more items per row rather than multiple colors of the same thing.</STR>
+    <KEY>Arro/MCR/CompactModeAccessories</KEY>
+    <STR>Compact Mode For Accessories</STR>
+    <KEY>Arro/MCR/CompactModeAccessoriesTooltip</KEY>
+    <STR>Instead of showing one accessory item and its color swatches, it places different pieces of accessories in those slots. This lets you see more items per row rather than multiple colors of the same thing.</STR>
+    <KEY>Arro/MCR/EnableAnimations</KEY>
+    <STR>Scroll Animation</STR>
+    <KEY>Arro/MCR/EnableAnimationsTooltip</KEY>
+    <STR>Applies a smooth fade-in effect to items as they load, replacing the default instant pop-in.</STR>
+</TEXT>

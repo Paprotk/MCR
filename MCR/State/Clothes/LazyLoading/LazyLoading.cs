@@ -774,8 +774,8 @@ public static class LazyLoading
         gSingleton.mCurrentFocusedRow = null;
         gSingleton.mTempFocusedRow = null;
         gSingleton.mSelectedType = CASClothingRow.SelectedTypes.None;
-        gSingleton.mShareButton.Enabled = false;
         gSingleton.mTrashButton.Enabled = false;
+        gSingleton.mShareButton.Enabled = true;
         gSingleton.mSaveButton.Enabled = false;
         gSingleton.mSortButton.Enabled = true;
         gSingleton.mSortButton.Tag = false;
@@ -966,7 +966,10 @@ public static class LazyLoading
                 CASClothingRow casclothingRow =
                     UIManager.LoadLayout(LazyLoading.LayoutKey).GetWindowByExportID<CASClothingRow>(1);
                 if (casclothingRow == null) return false;
-                casclothingRow.FadeIn(200, FakeFade.EaseType.EaseOut);
+                if (Config.Data.Clothes.AnimationEnabled)
+                {
+                    casclothingRow.FadeIn(200, FakeFade.EaseType.EaseOut);
+                }
                 casclothingRow.RowController = gSingleton;
 
                 if (group.Count > 0 && group[0] is CASPart)
@@ -1039,7 +1042,10 @@ public static class LazyLoading
                 CASClothingRow casclothingRow =
                     UIManager.LoadLayout(LazyLoading.LayoutKey).GetWindowByExportID<CASClothingRow>(1);
                 if (casclothingRow == null) return false;
-                casclothingRow.FadeIn(200, FakeFade.EaseType.EaseOut);
+                if (Config.Data.Clothes.AnimationEnabled)
+                {
+                    casclothingRow.FadeIn(200, FakeFade.EaseType.EaseOut);
+                }
                 casclothingRow.UseEp5AsBaseContent = gSingleton.mIsEp5Base;
                 casclothingRow.CASPart = caspart;
                 casclothingRow.RowController = gSingleton;

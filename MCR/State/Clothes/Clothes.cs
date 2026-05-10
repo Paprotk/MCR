@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Arro.Common;
+using Sims3.Gameplay.Utilities;
 using Sims3.SimIFace;
 using Sims3.UI;
 using Sims3.UI.CAS;
@@ -69,12 +70,13 @@ public abstract class Clothes
         {
             CASClothingCategory.gSingleton.mTrashButton,
             CASClothingCategory.gSingleton.mSaveButton,
-            CASClothingCategory.gSingleton.mShareButton,
         };
         foreach (var button in designButtons)
         {
             button.Visible = false;
         }
+
+        ShareButtonHook();
 
         if (Config.Data.Clothes.ColumnCount > 1)
         {
@@ -148,7 +150,36 @@ public abstract class Clothes
             }
         }
     }
-    
+
+    private static void ShareButtonHook()
+    {
+        CASClothingCategory.gSingleton.mShareButton.Tick += OnShareButtonTick;
+        CASClothingCategory.gSingleton.mShareButton.Tick += OnShareButtonTick;
+        CASClothingCategory.gSingleton.mShareButton.Click -= CASClothingCategory.gSingleton.OnShareButtonClick;
+        CASClothingCategory.gSingleton.mShareButton.Click -= Config.ShowMCRDialog;
+        CASClothingCategory.gSingleton.mShareButton.Click += Config.ShowMCRDialog;
+        CASClothingCategory.gSingleton.mShareButton.TooltipText = Localization.LocalizeString("Arro/MCR/ConfigureGrid");
+        var multiDrawable = CASClothingCategory.gSingleton.mShareButton.Drawable as MultiDrawable;
+        var buttonIconDrawable = multiDrawable?[1U];
+        var iconDrawable = buttonIconDrawable as IconDrawable;
+        iconDrawable?.Image = UIManager.LoadUIImage(ResourceKey.CreatePNGKey("arro_mcr_grid_icon", 0U));
+        iconDrawable?.Scale = 0.8f * TinyUIFix.Scale;
+        EffectManager.AddScaleEffect(CASClothingCategory.gSingleton.mShareButton, duration: 0.1f,
+            triggerType: EffectBase.TriggerTypes.MouseFocus);
+        CASClothingCategory.gSingleton.mShareButton.Invalidate();
+        CASClothingCategory.gSingleton.mShareButton.Position = new Vector2(
+            CASClothingCategory.gSingleton.mTrashButton.Position.x +
+            13f * TinyUIFix.Scale,
+            CASClothingCategory.gSingleton.mSortButton.Position.y -
+            12.5f * TinyUIFix.Scale);
+    }
+
+    private static void OnShareButtonTick(WindowBase sender, UIEventArgs eventArgs)
+    {
+        CASClothingCategory.gSingleton.mShareButton.Enabled = true;
+    }
+
+
     private static void OnSideButtonOnFocusAcquired(WindowBase sender, UIFocusChangeEventArgs eventArgs)
     {
         if (sender.Tag is GrowEffect grow && sender.DrawState != (uint)WindowBase.DrawStateFlags.kDrawStateActive)

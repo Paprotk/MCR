@@ -23,26 +23,15 @@ public class CASHookTask : Task
         if (!IsClothesProcessing && (CASClothing.gSingleton != null || CASDresserClothing.gSingleton != null || CAPAccessories.gSingleton != null))
         {
             SetBool(true, false, false);
-            if (Config.ClothesModuleInstalled)
-            {
-                Clothes.Hook();
-            }
+            Clothes.Hook();
         }
         else if (!IsFaceProcessing && CASFacialDetails.gSingleton != null)
         {
             SetBool(false, true, false);
-            if (Config.FaceModuleInstalled)
-            {
-                //Face.Hook;
-            }
         }
         else if (!IsHairProcessing && CASPhysical.gSingleton != null)
         {
             SetBool(false, false, true);
-            if (Config.HairModuleInstalled)
-            {
-                //Hair.Hook
-            }
         }
         else if (CASClothing.gSingleton == null && CASDresserClothing.gSingleton == null && CAPAccessories.gSingleton == null && CASFacialDetails.gSingleton == null && CASPhysical.gSingleton == null)
         {

@@ -48,11 +48,11 @@
     <Compile Include="..\..\Common\Common\**\*.cs">
       <Link>Common\%(RecursiveDir)%(FileName)%(Extension)</Link>
     </Compile>
+    <Compile Include="MCRInputDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CASHookTask.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="Data.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="State\Clothes\Clothes.cs" />
@@ -61,6 +61,53 @@
   <ItemGroup>
     <UpToDateCheckInput Include="resources\**\*" />
     <Content Include="Resources\Arro.MCR.Main.xml" />
+    <Content Include="Resources\Images\arro_columns_icon.png" />
+    <Content Include="Resources\Images\arro_mcr_grid_icon.png" />
+    <Content Include="Resources\Images\arro_reset_icon.png" />
+    <Content Include="Resources\Images\arro_rows_icon.png" />
+    <Content Include="Resources\Layouts\MCRInputDialog.xml" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_CZE_CZ.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_DAN_DK.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_DUT_NL.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_ENG_US.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_FIN_FI.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_FRE_FR.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_GER_DE.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_HUN_HU.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_ITA_IT.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_KOR_KR.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_NOR_NO.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_POL_PL.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_POR_BR.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_POR_PT.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_RUS_RU.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_SPA_ES.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_SPA_MX.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_SWE_SE.txt" />
+    <Content Include="Resources\Localization\Localization_Source\ArroMCR_THA_TH.txt" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_CHS_CN.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_CHT_CN.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_CZE_CZ.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_DAN_DK.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_DUT_NL.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_ENG_US.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_FIN_FI.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_FRE_FR.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_GER_DE.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_GRE_GR.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_HUN_HU.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_ITA_IT.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_JPN_JP.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_KOR_KR.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_NOR_NO.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_POL_PL.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_POR_BR.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_POR_PT.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_RUS_RU.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_SPA_ES.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_SPA_MX.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_SWE_SE.stbl" />
+    <Content Include="Resources\Localization\Localization_Source\Compiled_STBL\ArroMCR_THA_TH.stbl" />
     <Content Include="Resources\nameMap.xml" />
     <Content Include="Resources\nameMap.xsd" />
   </ItemGroup>
@@ -90,7 +137,7 @@
       <HintPath>..\..\DLLS\System.Xml.dll</HintPath>
     </Reference>
     <Reference Include="UI">
-      <HintPath>..\..\DLLS\UI_MCR.dll</HintPath>
+      <HintPath>..\..\DLLS\UI_MCR_2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

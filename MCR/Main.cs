@@ -1,19 +1,11 @@
 ﻿using Sims3.SimIFace;
 using Sims3.UI;
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using Arro.Common;
-using ScriptCore;
-using Sims3.Gameplay.Actors;
-using Sims3.UI.CAS;
-using Sims3.UI.Hud;
 using Simulator = Sims3.SimIFace.Simulator;
 using static Arro.Common.Logger;
-using Animation = Sims3.SimIFace.Animation;
 using Event = Arro.Common.Event;
-using GameUtils = Sims3.SimIFace.GameUtils;
-using OnlineFeatures = Sims3.SimIFace.OnlineFeatures;
 using StopWatch = Sims3.SimIFace.StopWatch;
 
 namespace Arro.MCR;
@@ -25,7 +17,7 @@ public class Main
     [GetAssembly("LazyDuchess.SmoothPatch")]
     public static Assembly LD_SmoothPatch;
     
-    public static string ModVersion = "V2.2";
+    public static float ModVersion = 2.2f;
 
     [Tunable]
 #pragma warning disable CS0169 // Field is never used
@@ -37,12 +29,6 @@ public class Main
         Core.Initialize("MCR");
     }
 
-    [InvokeOnWorldEvent(Event.OnStartupApp)]
-    public static void OnStartupApp(object sender, EventArgs e)
-    {
-        Config.Parse();
-    }
-
     [InvokeOnWorldEvent(Event.OnWorldLoadFinished)]
     public static void OnWorldLoadFinished(object sender, EventArgs e)
     {
@@ -52,6 +38,7 @@ public class Main
             Sims3.Gameplay.UI.Responder.Instance.GameStateChanging += OnGameStateChanged;
         }
         if (LD_SmoothPatch != null) DestroyLDTask();
+        Config.LoadConfig();
     }
 
     private static void DestroyLDTask()
