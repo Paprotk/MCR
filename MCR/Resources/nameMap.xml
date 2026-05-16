@@ -5,7 +5,6 @@
 	<resource name="MCRInputDialog" type="0x025C95B6"/>
 	<resource name="arro_mcr_grid_icon" type="0x2F7D0004"/>
 	<resource name="arro_columns_icon" type="0x2F7D0004"/>
-	<resource name="arro_reset_icon" type="0x2F7D0004"/>
 	<resource name="arro_rows_icon" type="0x2F7D0004"/>
 	<resource name="*.stbl" type="0x220557DA"/>
 </resources>

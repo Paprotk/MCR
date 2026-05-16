@@ -63,7 +63,6 @@
     <Content Include="Resources\Arro.MCR.Main.xml" />
     <Content Include="Resources\Images\arro_columns_icon.png" />
     <Content Include="Resources\Images\arro_mcr_grid_icon.png" />
-    <Content Include="Resources\Images\arro_reset_icon.png" />
     <Content Include="Resources\Images\arro_rows_icon.png" />
     <Content Include="Resources\Layouts\MCRInputDialog.xml" />
     <Content Include="Resources\Localization\Localization_Source\ArroMCR_CZE_CZ.txt" />

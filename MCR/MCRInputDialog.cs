@@ -53,9 +53,9 @@ namespace Arro.MCR
                 {
                     button1.Caption = Localization.LocalizeString("Arro/MCR/EnableSmoothpatchFeatures");
                     button1.TooltipText = Localization.LocalizeString("Arro/MCR/EnableSmoothpatchFeaturesTooltip");
-                    button1.Click += (s, e) => {
+                    button1.Click += (_, _) => {
                         TempSmoothPatch = !TempSmoothPatch;
-                        RefreshCompactButtons(button1, button2, button3, button4);
+                        RefreshDialogButtons(button1, button2, button3, button4);
                     };
                 }
 
@@ -63,10 +63,10 @@ namespace Arro.MCR
                 {
                     button2.Caption = Localization.LocalizeString("Arro/MCR/CompactModeClothes");
                     button2.TooltipText = Localization.LocalizeString("Arro/MCR/CompactModeClothesTooltip");
-                    button2.Click += (s, e) => {
+                    button2.Click += (_, _) => {
                         if (TempSmoothPatch) {
                             TempCompactClothes = !TempCompactClothes;
-                            RefreshCompactButtons(button1, button2, button3, button4);
+                            RefreshDialogButtons(button1, button2, button3, button4);
                         }
                     };
                 }
@@ -75,10 +75,10 @@ namespace Arro.MCR
                 {
                     button3.Caption = Localization.LocalizeString("Arro/MCR/CompactModeAccessories");
                     button3.TooltipText = Localization.LocalizeString("Arro/MCR/CompactModeAccessoriesTooltip");
-                    button3.Click += (s, e) => {
+                    button3.Click += (_, _) => {
                         if (TempSmoothPatch) {
                             TempCompactAccessories = !TempCompactAccessories;
-                            RefreshCompactButtons(button1, button2, button3, button4);
+                            RefreshDialogButtons(button1, button2, button3, button4);
                         }
                     };
                 }
@@ -87,15 +87,15 @@ namespace Arro.MCR
                 {
                     button4.Caption = Localization.LocalizeString("Arro/MCR/EnableAnimations");
                     button4.TooltipText = Localization.LocalizeString("Arro/MCR/EnableAnimationsTooltip");
-                    button4.Click += (s, e) => {
+                    button4.Click += (_, _) => {
                         if (TempSmoothPatch) {
                             TempAnimation = !TempAnimation;
-                            RefreshCompactButtons(button1, button2, button3, button4);
+                            RefreshDialogButtons(button1, button2, button3, button4);
                         }
                     };
                 }
                 
-                RefreshCompactButtons(button1, button2, button3, button4);
+                RefreshDialogButtons(button1, button2, button3, button4);
             }
             mSecondEntryTextEdit.MaxTextLength = 2U;
             mEntryTextEdit.MaxTextLength = 2U;
@@ -112,7 +112,7 @@ namespace Arro.MCR
             }
         }
 
-        private void RefreshCompactButtons(Button b1, Button b2, Button b3, Button b4)
+        private void RefreshDialogButtons(Button b1, Button b2, Button b3, Button b4)
         {
             if (b1 == null) return;
             b1.Selected = TempSmoothPatch;
@@ -120,21 +120,21 @@ namespace Arro.MCR
             if (b2 != null)
             {
                 b2.Enabled = TempSmoothPatch;
-                b2.SetOpacity(TempSmoothPatch ? (byte)255 : (byte)125);
+                b2.SetOpacity(TempSmoothPatch ? 255 : 125);
                 b2.Selected = TempSmoothPatch && TempCompactClothes;
             }
             
             if (b3 != null)
             {
                 b3.Enabled = TempSmoothPatch;
-                b3.SetOpacity(TempSmoothPatch ? (byte)255 : (byte)125);
+                b3.SetOpacity(TempSmoothPatch ? 255 : 125);
                 b3.Selected = TempSmoothPatch && TempCompactAccessories;
             }
             
             if (b4 != null)
             {
                 b4.Enabled = TempSmoothPatch;
-                b4.SetOpacity(TempSmoothPatch ? (byte)255 : (byte)125);
+                b4.SetOpacity(TempSmoothPatch ? 255 : 125);
                 b4.Selected = TempSmoothPatch && TempAnimation;
             }
         }

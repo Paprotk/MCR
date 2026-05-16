@@ -17,7 +17,7 @@ public class Main
     [GetAssembly("LazyDuchess.SmoothPatch")]
     public static Assembly LD_SmoothPatch;
     
-    public static float ModVersion = 2.2f;
+    public static readonly float ModVersion = 2.2f;
 
     [Tunable]
 #pragma warning disable CS0169 // Field is never used
@@ -29,7 +29,7 @@ public class Main
         Core.Initialize("MCR");
     }
 
-    [InvokeOnWorldEvent(Event.OnWorldLoadFinished)]
+   [InvokeOnWorldEvent(Event.OnWorldLoadFinished)]
     public static void OnWorldLoadFinished(object sender, EventArgs e)
     {
         if (Sims3.Gameplay.UI.Responder.Instance != null)

@@ -11,4 +11,4 @@ C:\Users\Arek\RiderProjects\MCR\MCR\bin\Release\System.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Release\System.Xml.dll
 C:\Users\Arek\RiderProjects\MCR\MCR\obj\Release\MCR.csproj.Up2Date
 C:\Users\Arek\RiderProjects\MCR\MCR\bin\Release\ScriptCore.dll
-C:\Users\Arek\RiderProjects\MCR\MCR\bin\Release\UI_MCR.dll
+C:\Users\Arek\RiderProjects\MCR\MCR\bin\Release\UI_MCR_2.dll

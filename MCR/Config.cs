@@ -75,8 +75,8 @@ public abstract class Config
                            $"- ColumnCount: {Data.Clothes.ColumnCount}\n" +
                            $"- SmoothPatch: {Data.Clothes.SmoothPatchEnabled}\n" +
                            $"- CompactClothes: {Data.Clothes.CompactModeClothesEnabled}\n" +
-                           $"- CompactAccessories: {Data.Clothes.CompactModeAccessoriesEnabled}" +
-                           $"- Animation: {Data.Clothes.AnimationEnabled}\n");
+                           $"- CompactAccessories: {Data.Clothes.CompactModeAccessoriesEnabled}\n" +
+                           $"- Animation: {Data.Clothes.AnimationEnabled}");
                             
 
                 if (loaded.Version < Main.ModVersion)
@@ -100,6 +100,12 @@ public abstract class Config
 
     public static void SaveConfig()
     {
+        Simulator.AddObject(new OneShotFunctionTask(SaveConfigWithUITask));
+    }
+
+    private static void SaveConfigWithUITask()
+    {
+        ProgressDialog.Show(Localization.LocalizeString("Ui/Caption/Options:Loading"));
         try
         {
             ConfigSchema toSave = new ConfigSchema
@@ -112,13 +118,18 @@ public abstract class Config
                 CompactModeAccessoriesEnabled = Data.Clothes.CompactModeAccessoriesEnabled,
                 AnimationEnabled = Data.Clothes.AnimationEnabled,
             };
-
+            
             IniConfig.Save(FileName, toSave);
             Logger.Log("Config saved to file");
         }
         catch (Exception e)
         {
             Logger.Log("Error during saving config to file: " + e.Message);
+        }
+        finally
+        {
+            ProgressDialog.Close();
+            RefreshCASUI();
         }
     }
     
@@ -178,7 +189,6 @@ public abstract class Config
                     Data.Clothes.AnimationEnabled = dialog.TempAnimation;
 
                     SaveConfig();
-                    RefreshCASUI();
                 }
             }
 

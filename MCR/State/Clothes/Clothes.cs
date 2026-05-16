@@ -36,21 +36,12 @@ public abstract class Clothes
 
     public static void GetCurrentLayout()
     {
-        if (CASClothing.sClothingLayout != null && CASDresserClothing.sClothingLayout == null &&
-            CAPAccessories.sCAPAccessoriesLayout == null)
-        {
+        if (CASClothing.sClothingLayout != null) 
             _currentLayout = CASClothing.gSingleton;
-        }
-        else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout != null &&
-                 CAPAccessories.sCAPAccessoriesLayout == null)
-        {
+        else if (CASDresserClothing.sClothingLayout != null) 
             _currentLayout = CASDresserClothing.gSingleton;
-        }
-        else if (CASClothing.sClothingLayout == null && CASDresserClothing.sClothingLayout == null &&
-                 CAPAccessories.sCAPAccessoriesLayout != null)
-        {
+        else if (CAPAccessories.sCAPAccessoriesLayout != null) 
             _currentLayout = CAPAccessories.gSingleton;
-        }
     }
 
     public static void SetClothesItemGrid()
@@ -153,7 +144,7 @@ public abstract class Clothes
 
     private static void ShareButtonHook()
     {
-        CASClothingCategory.gSingleton.mShareButton.Tick += OnShareButtonTick;
+        CASClothingCategory.gSingleton.mShareButton.Tick -= OnShareButtonTick;
         CASClothingCategory.gSingleton.mShareButton.Tick += OnShareButtonTick;
         CASClothingCategory.gSingleton.mShareButton.Click -= CASClothingCategory.gSingleton.OnShareButtonClick;
         CASClothingCategory.gSingleton.mShareButton.Click -= Config.ShowMCRDialog;
